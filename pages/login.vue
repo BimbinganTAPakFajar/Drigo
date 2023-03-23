@@ -57,6 +57,7 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig();
 const token = useCookie("token", {
   maxAge: 60 * 10,
 });
@@ -66,7 +67,7 @@ let password = ref("asd@asd.com");
 let identifier = ref("password");
 
 async function submit() {
-  const data = await $fetch("http://localhost:1337/api/auth/local", {
+  const data = await $fetch(`${config.strapiEndpoint}/auth/local`, {
     body: {
       // identifier: identifier.value,
       // password: password.value,

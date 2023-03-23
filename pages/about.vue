@@ -109,12 +109,13 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig();
 const skill = ["Excellent Angle Photo", "Great Color Grading"];
 const openCrew = ref(false);
 
 let data = ref({});
 let count = ref();
-await $fetch("http://localhost:1337/api/about-us", {
+await $fetch(`${config.strapiEndpoint}/about-us`, {
   method: "get",
 })
   .then((res) => {

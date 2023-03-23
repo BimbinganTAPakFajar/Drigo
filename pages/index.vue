@@ -3,9 +3,7 @@
     class="text-white mx-auto flex flex-col gap-24 items-center justify-center bg- w-[90%]"
   >
     <!-- Card First  -->
-    <p class="text-black">
-      {{ image }}
-    </p>
+
     <div
       class="flex gap-20 rounded-2xl overflow-hidden items-center bg-[#FAFAFA]"
     >
@@ -185,9 +183,11 @@
 
 <script setup>
 definePageMeta({ layout: "index" });
+const config = useRuntimeConfig();
+
 let data = ref({});
 let image = ref({});
-await $fetch("http://localhost:1337/api/landing-page?populate=*", {
+await $fetch(`${config.strapiEndpoint}/landing-page?populate=*`, {
   method: "get",
 })
   .then((res) => {

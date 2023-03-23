@@ -3,6 +3,8 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@nuxtjs/fontaine"],
   css: ["@/assets/css/style.css"],
   runtimeConfig: {
-    STRAPI_BASE_URL: process.env.STRAPI_ENDPOINT,
+    public: {
+      strapiEndpoint: process.env.STRAPI_ENDPOINT,
+    },
   },
 });
