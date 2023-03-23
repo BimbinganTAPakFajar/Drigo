@@ -6,6 +6,8 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script setup>
+definePageMeta({
+  middleware: ["auth"],
+});
 </script>

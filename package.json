@@ -8,7 +8,9 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@nuxtjs/fontaine": "^0.2.4",
     "@nuxtjs/tailwindcss": "^6.4.1",
+    "@sidebase/nuxt-auth": "^0.4.4",
     "nuxt": "^3.2.3"
   },
   "dependencies": {

@@ -3,27 +3,25 @@
     class="text-white mx-auto flex flex-col gap-24 items-center justify-center bg- w-[90%]"
   >
     <!-- Card First  -->
+    <p class="text-black">
+      {{ image }}
+    </p>
     <div
       class="flex gap-20 rounded-2xl overflow-hidden items-center bg-[#FAFAFA]"
     >
       <div class="flex flex-col gap-10 xl:p-10 2xl:p-20 aspect-[1/0.467]">
         <h1 class="titleCard font-bold text-black">
-          Elevate Your Big Day with Our Premier Vendor Services
+          {{ data.headerTitle }}
         </h1>
         <p class="text-[#7B7B7B] text-lg text-justify">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, cum!
-          Perspiciatis recusandae praesentium nam. Aliquam amet natus, quisquam
-          sit aspernatur maxime laboriosam doloremque saepe ab? Nostrum aperiam
-          omnis facere minus? Dolore impedit ipsa veniam ab minima sint, a magni
-          quaerat pariatur itaque totam suscipit, ipsam enim corporis
-          exercitationem? Voluptate, alias.
+          {{ data.headerDescription }}
         </p>
       </div>
 
       <div class="aspect-[1/0.96] rounded-md overflow-hidden">
         <img
           class="w-full h-full"
-          src="https://ik.imagekit.io/drigoalexander/danie-franco-7XqL_DVuBMw-unsplash_K5AtA7THc.jpg?updatedAt=1678532712830"
+          :src="'http://localhost:1337' + image"
           alt="Wedding Image"
         />
       </div>
@@ -32,18 +30,18 @@
 
     <!-- Second Card -->
     <div
-      class="flex gap-10 rounded-2xl items-center bg-[#FAFAFA] p-28 w-full justify-between"
+      class="flex gap-20 rounded-2xl items-center bg-[#FAFAFA] px-20 py-28 w-full justify-between"
     >
-      <div class="flex flex-col gap-2 p-8">
+      <div class="flex flex-col gap-2 p-10 w-2/3">
         <p class="text-lg text-[#3258E8]">Our Service</p>
-        <h2 class="font-semibold text-black text-5xl">
+        <h2 class="font-semibold text-black text-5xl inline w-full">
           We Offer <br />Best Service
         </h2>
       </div>
       <div class="grid grid-cols-2 gap-20">
         <div
-          class="col-span-1 flex items-center justify-center gap-10"
-          v-for="(el, idx) in detail"
+          class="col-span-1 flex items-start justify-center gap-10"
+          v-for="(el, idx) in data.organizerStrength"
           :key="idx"
         >
           <div class="bg-white aspect-square rounded-xl p-6">
@@ -51,7 +49,7 @@
           </div>
 
           <div
-            class="flex flex-col gap-2 items-start text-black tracking-wider pr-10"
+            class="flex flex-col gap-2 justify-start items-start text-black tracking-wider pr-10"
           >
             <h2 class="text-2xl font-semibold">
               {{ el.title }}
@@ -84,12 +82,12 @@
         </p>
         <div class="flex gap-10 items-start">
           <div
-            v-for="(el, idx) in packageData"
+            v-for="(el, idx) in data.weddingStats"
             :key="idx"
             class="flex flex-col gap-4 w-44"
           >
             <h1 class="text-black font-semibold text-2xl">
-              {{ el.quantity }}
+              {{ el.stats }}
             </h1>
             <p class="text-[#7B7B7B] font-regular text-base">
               {{ el.description }}
@@ -187,15 +185,21 @@
 
 <script setup>
 definePageMeta({ layout: "index" });
-
-const response = $fetch("http://localhost:1337/api/blogs", {
+let data = ref({});
+let image = ref({});
+await $fetch("http://localhost:1337/api/landing-page?populate=*", {
   method: "get",
-  headers: {
-    Authorization:
-      "Bearer 6b0a778900fb45d1bc7e83da3a6c8265291e816824a163737dd0e5975ab14b5d63169c9e31fae29799ca2259f39c7eda9cb8ff706d1bdbfc4c4da7852ad5c365600477072253b9c443ac6db1886ec40fdcd05a1c766fc1c9e07ecb85a0b913e6b3e3b89c750f6a6ba19aa405590df530cf718ae8c98c05dbbb4836563fe9ef7d",
-  },
-});
-console.log(response);
+})
+  .then((res) => {
+    (data.value = res.data.attributes),
+      (image.value = res.data.attributes.jumbotronImage.data.attributes);
+  })
+  .catch((err) => console.log(err));
+
+// const { data } = await useFetch(
+//   "http://localhost:1337/api/landing-page?populate=*"
+// );
+
 const calendarList = [
   {
     image: "/assets/albert.jpg",

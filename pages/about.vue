@@ -1,6 +1,7 @@
 <template>
   <div class="justify-center flex items-center flex-col gap-32 max-w-screen-lg">
     <!-- Stats Crew-->
+
     <div
       v-if="openCrew === true"
       class="fixed flex flex-col text-black left-[5%] top-1/2 -translate-y-1/2 gap-10 text-justify"
@@ -49,86 +50,44 @@
 
     <div class="flex flex-col gap-10 w-full items-start">
       <h2 class="text-[#666666] font-semibold text-xl self-start">
-        Who are we?
+        {{ data.aboutTitle }}
       </h2>
-      <p class="text-justify tracking-wider leading-loose font-medium">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum
-        distinctio perferendis deleniti. Magni rem maxime libero assumenda
-        autem. Saepe commodi magni adipisci voluptatibus natus accusamus aliquid
-        nesciunt quo. Assumenda dolores natus eveniet velit reiciendis
-        voluptatem veniam, error inventore mollitia impedit ratione incidunt?
-        Tempore dolorum sequi debitis doloremque perspiciatis quibusdam atque
-        id. Soluta sunt reprehenderit quae magnam provident, cum eaque eius,
-        ipsum laudantium maiores delectus debitis, deserunt consequatur natus
-        quidem hic nam odio aperiam minus. Obcaecati fugiat voluptate a nesciunt
-        hic eveniet harum perferendis non tempora dolorem blanditiis, delectus
-        earum, ab asperiores suscipit voluptas, iusto minima vel. Ipsum rem
-        tenetur, alias modi animi minima incidunt necessitatibus voluptatum
-        nobis totam ex perferendis corrupti saepe facilis adipisci sequi odio
-        perspiciatis quod officia possimus dicta consequatur. Beatae quidem
-        minus, id iusto animi velit deleniti soluta repellat aliquid excepturi
-        numquam. Nostrum illum qui illo, maiores aliquam sapiente quia quidem
-        asperiores recusandae fugit culpa animi facere tempora quam nisi aut,
-        minima ab laboriosam magni aliquid unde veritatis labore velit?
-        Necessitatibus molestiae a ratione esse ut, consequuntur officia
-        cupiditate? Dolore excepturi obcaecati debitis maiores libero, repellat
-        et alias aperiam molestias rerum cupiditate tempore totam ipsam dolor
-        optio sapiente est architecto dignissimos praesentium odio sit!
-        Quisquam, vitae nihil!
-      </p>
+      <article class="text-justify tracking-wider leading-loose font-medium">
+        {{ data.aboutDesc }}
+      </article>
     </div>
     <!-- Timeline -->
     <div class="flex flex-col gap-10">
-      <div class="items-start flex w-full flex-col gap-6">
+      <div
+        class="items-start flex w-full flex-col gap-6"
+        v-for="(el, idx) in data.history"
+        :key="idx"
+      >
         <h2 class="text-3xl font-semibold text-[#725AE4] tracking-wider">
-          2021
+          {{ el.year }}
         </h2>
         <h4
           class="text-2xl font-semibold text-[#666666] flex gap-4 items-center"
         >
-          We Start Our business
-          <span><BuildingStorefrontIcon class="w-6 aspect-square" /></span>
+          {{ el.title }}
+          <span v-html="el.icon"></span>
         </h4>
         <p class="text-black text-lg font-medium text-justify">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed ipsa
-          pariatur facilis voluptatem vel placeat eos, distinctio beatae quis
-          quos rerum fugit ut ea et reprehenderit atque? Molestias in
-          perferendis praesentium accusantium ratione impedit ducimus fuga nisi
-          explicabo ipsam? Libero, officiis quod architecto ipsa in quidem enim
-          sed. Corporis, fuga.
+          {{ el.description }}
         </p>
-      </div>
-      <div class="w-full items-start justify-start">
-        <div
-          class="h-20 w-[2px] relative bg-[#725AE4] justify-start flex items-start"
-        >
+        <p class="text-black">{{ el.length }}</p>
+        <div class="w-full items-start justify-start" v-if="idx !== count - 1">
           <div
-            class="absolute bg-[#725AE4] rounded-full w-3 aspect-square -top-2 left-1/2 -translate-x-1/2"
-          ></div>
-          <div
-            class="absolute bg-[#725AE4] rounded-full w-3 aspect-square -bottom-2 left-1/2 -translate-x-1/2"
-          ></div>
+            class="h-20 w-[2px] relative bg-[#725AE4] justify-start flex items-start"
+          >
+            <div
+              class="absolute bg-[#725AE4] rounded-full w-3 aspect-square -top-2 left-1/2 -translate-x-1/2"
+            ></div>
+            <div
+              class="absolute bg-[#725AE4] rounded-full w-3 aspect-square -bottom-2 left-1/2 -translate-x-1/2"
+            ></div>
+          </div>
         </div>
-      </div>
-
-      <div class="items-start flex w-full flex-col gap-6">
-        <h2 class="text-3xl font-semibold text-[#725AE4] tracking-wider">
-          2022
-        </h2>
-        <h4
-          class="text-2xl font-semibold text-[#666666] flex gap-4 items-center"
-        >
-          Our business starts to grow
-          <span><ArrowTrendingUpIcon class="w-6 aspect-square" /></span>
-        </h4>
-        <p class="text-black text-lg font-medium text-justify">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed ipsa
-          pariatur facilis voluptatem vel placeat eos, distinctio beatae quis
-          quos rerum fugit ut ea et reprehenderit atque? Molestias in
-          perferendis praesentium accusantium ratione impedit ducimus fuga nisi
-          explicabo ipsam? Libero, officiis quod architecto ipsa in quidem enim
-          sed. Corporis, fuga.
-        </p>
       </div>
     </div>
     <!-- End Timeline -->
@@ -150,12 +109,19 @@
 </template>
 
 <script setup>
-import {
-  BuildingStorefrontIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-} from "@heroicons/vue/24/outline";
 const skill = ["Excellent Angle Photo", "Great Color Grading"];
 const openCrew = ref(false);
+
+let data = ref({});
+let count = ref();
+await $fetch("http://localhost:1337/api/about-us", {
+  method: "get",
+})
+  .then((res) => {
+    data = res.data.attributes;
+    count = res.data.attributes.history.length;
+  })
+  .catch((err) => console.log(err));
+
 definePageMeta({ layout: "no-footer" });
 </script>
