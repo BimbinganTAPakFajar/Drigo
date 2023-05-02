@@ -1,13 +1,18 @@
 <template>
   <div
-    class="text-white mx-auto flex flex-col gap-24 items-center justify-center bg- w-[90%]"
+    class="flex items-center justify-center h-screen w-full"
+    v-if="errCode === 1"
+  >
+    Oops, our service for this page isn't ready yet
+  </div>
+  <div
+    v-else
+    class="text-white mx-auto flex flex-col gap-24 items-center justify-center bg- w-full py-10"
   >
     <!-- Card First  -->
 
-    <div
-      class="flex gap-20 rounded-2xl overflow-hidden items-center bg-[#FAFAFA]"
-    >
-      <div class="flex flex-col gap-10 xl:p-10 2xl:p-20 aspect-[1/0.467]">
+    <div class="flex gap-20 rounded-2xl ]">
+      <div class="flex flex-col gap-10 xl:p-10 2xl:p-20 w-1/2">
         <h1 class="titleCard font-bold text-black">
           {{ data.headerTitle }}
         </h1>
@@ -16,13 +21,11 @@
         </p>
       </div>
 
-      <div class="aspect-[1/0.96] rounded-md overflow-hidden">
-        <img
-          class="w-full h-full"
-          :src="'http://localhost:1337' + image"
-          alt="Wedding Image"
-        />
-      </div>
+      <img
+        class="w-1/2 max-lg:shrink-0"
+        :src="data.jumbotronImage.data.attributes.url"
+        alt="Wedding Image"
+      />
     </div>
     <!-- End Card First  -->
 
@@ -63,7 +66,7 @@
     <!-- Choose Package -->
     <div class="flex items-center justify-evenly gap-20">
       <div class="flex gap-10">
-        <card
+        <CardPackage
           v-for="(el, idx) in cardPackage"
           :key="idx"
           :package="el.package"
@@ -127,7 +130,7 @@
     <!-- End Schedule Calender -->
 
     <!-- Advertisement -->
-    <div
+    <!-- <div
       class="w-full rounded-tl-[5rem] rounded-xl flex items-center justify-center relative bg-[#3258E8]/10"
     >
       <div
@@ -176,29 +179,60 @@
         </p>
         <Button :type="1" class="z-10 relative" buttonText="Book now" />
       </div>
-    </div>
+    </div> -->
     <!-- End Advertisement -->
   </div>
 </template>
 
 <script setup>
+import { useParallax } from "@vueuse/core";
+
 definePageMeta({ layout: "index" });
 const config = useRuntimeConfig();
-
+const token = useCookie("token");
+const role = useCookie("role");
+const id = useCookie("id");
 let data = ref({});
 let image = ref({});
+let errCode = ref();
+
+const parallaxImage = ref(null);
+const { tilt, roll, source } = useParallax(parallaxImage);
+
 await $fetch(`${config.strapiEndpoint}/landing-page?populate=*`, {
   method: "get",
 })
   .then((res) => {
     (data.value = res.data.attributes),
       (image.value = res.data.attributes.jumbotronImage.data.attributes);
+    errCode = 0;
+    console.log(errCode);
   })
-  .catch((err) => console.log(err));
+  .catch((err) => (errCode = 1));
 
-// const { data } = await useFetch(
-//   "http://localhost:1337/api/landing-page?populate=*"
-// );
+if (token.value) {
+  const user = await $fetch(`${config.strapiEndpoint}/users/me?populate=*`, {
+    method: "GET",
+    headers: {
+      "content-type": "application/json",
+      Authorization: "Bearer " + token.value,
+    },
+  });
+
+  const layer0 = computed(() => ({
+    transform: `translateX(${tilt * 10}px) translateY(${
+      roll * 10
+    }px) scale(1.33)`,
+  }));
+
+  id.value = user.id;
+  if (!role.value) {
+    // let encode = btoa(user.identifier.id)
+    // console.log(encode)
+    // role.value = encode
+    role.value = user.identifier.id;
+  }
+}
 
 const calendarList = [
   {
@@ -220,47 +254,6 @@ const calendarList = [
     image: "/assets/albert.jpg",
     customerName: "Albert Dera",
     packageName: "Outdoor Package",
-  },
-];
-const packageData = [
-  {
-    quantity: "5 Variant",
-    description: "Incredible package for your wedding",
-  },
-  {
-    quantity: "135K+",
-    description: "Customer has been served",
-  },
-  {
-    quantity: "35 Person",
-    description: "Best Wedding Crew that you can find",
-  },
-];
-
-const detail = [
-  {
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum",
-    iconLink:
-      "https://ik.imagekit.io/drigoalexander/Group_1340_puhys-Ant.png?updatedAt=1678538257940",
-  },
-  {
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum",
-    iconLink:
-      "https://ik.imagekit.io/drigoalexander/Group_1340_puhys-Ant.png?updatedAt=1678538257940",
-  },
-  {
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum",
-    iconLink:
-      "https://ik.imagekit.io/drigoalexander/Group_1340_puhys-Ant.png?updatedAt=1678538257940",
-  },
-  {
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum",
-    iconLink:
-      "https://ik.imagekit.io/drigoalexander/Group_1340_puhys-Ant.png?updatedAt=1678538257940",
   },
 ];
 

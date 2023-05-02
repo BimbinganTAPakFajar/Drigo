@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-white flex flex-col gap-20 mx-auto pt-10">
+  <div class="w-[90%] bg-white flex flex-col mx-auto">
     <Navbar />
     <slot />
     <Footer />
@@ -7,7 +7,5 @@
 </template>
 
 <script setup>
-definePageMeta({
-  middleware: ["auth"],
-});
+definePageMeta({});
 </script>

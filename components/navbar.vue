@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-center justify-between w-[90%] mx-auto">
-    <p>Wedding Organizer</p>
+  <div class="flex items-center justify-between w-full mx-auto py-14 z-10">
+    <img src="/assets/blissful.png" alt="" class="w-1/12" />
 
     <div class="flex items-center justify-center gap-6">
       <NuxtLink
@@ -16,7 +16,7 @@
           <Button :type="2" :buttonText="el.name" />
         </p>
         <p v-else-if="idx === 4 && isAuth === true" @click="logout">
-          <Button :type="1" :buttonText="el.name" />
+          <Button @submit.prevent="" :type="1" :buttonText="el.name" />
         </p>
         <p v-else-if="idx !== 4 && isAuth === undefined">
           {{ el.name }}
@@ -46,7 +46,7 @@ const listBar = [
   },
   {
     name: "Package",
-    url: "/",
+    url: "/package",
   },
   {
     name: "About Us",

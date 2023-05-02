@@ -45,11 +45,12 @@
           >
             Login
           </button>
-          <button
+          <NuxtLink
+            to="/register"
             class="px-6 py-3 bg-transparent duration-300 ease-in-out text-[#7B7B7B] focus:text-black hover:ring-2 ring-[#3258E8] rounded-xl w-3/4"
           >
             Register
-          </button>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -58,11 +59,19 @@
 
 <script setup>
 const config = useRuntimeConfig();
-const token = useCookie("token", {
-  maxAge: 60 * 10,
-});
-let isAuth = useCookie("isAuth");
-// const config = useRuntimeConfig();
+const token = useCookie(
+  "token"
+  //  {
+  //   // maxAge: 60 * 10,
+  //   }
+);
+
+let isAuth = useCookie(
+  "isAuth"
+  //  {
+  //   // maxAge: 60 * 10,
+  //   }
+);
 let password = ref("asd@asd.com");
 let identifier = ref("password");
 
@@ -71,7 +80,7 @@ async function submit() {
     body: {
       // identifier: identifier.value,
       // password: password.value,
-      identifier: "asd@asd.com",
+      identifier: "ads@asd.com",
       password: "password",
     },
     method: "POST",
@@ -79,6 +88,7 @@ async function submit() {
       "content-type": "application/json",
     },
   });
+
   token.value = data.jwt;
   isAuth.value = true;
   navigateTo("/");

@@ -2,9 +2,18 @@
 module.exports = {
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "gradient-pink": "#B06AB3",
+        "gradient-blue": "#4568DC",
+      },
+    },
   },
-  plugins: [require("daisyui")],
+  plugins: [
+    require("daisyui"),
+    require("flowbite/plugin"),
+    require("@tailwindcss/typography"),
+  ],
   daisyui: {
     styled: true,
     themes: false,
@@ -13,6 +22,5 @@ module.exports = {
     logs: false,
     rtl: false,
     prefix: "",
-    darkTheme: "",
   },
 };
