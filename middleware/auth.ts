@@ -5,7 +5,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
 
   if (!cookie.value) {
-    console.log("Helo");
     return navigateTo("/login");
   }
 });

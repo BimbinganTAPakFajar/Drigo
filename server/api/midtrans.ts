@@ -1,0 +1,22 @@
+import { Buffer } from "buffer";
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  const body = await readBody(event);
+
+  const data = await $fetch(`${config.public.midtransEndpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization:
+        "Basic " +
+        Buffer.from(`${config.public.midtransServerKey}`).toString("base64"),
+    },
+    body,
+  });
+
+  return {
+    data,
+  };
+});

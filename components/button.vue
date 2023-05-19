@@ -19,6 +19,19 @@
       {{ buttonText }}
     </button>
   </div>
+
+  <button
+    v-if="type === 4"
+    class="w-full bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-28 py-3"
+  >
+    {{ buttonText }}
+  </button>
+  <button
+    v-if="type === 5"
+    class="w-full bg-[#EA349E]/80 text-white rounded-xl focus:bg-[#EA349E] px-28 py-3"
+  >
+    {{ buttonText }}
+  </button>
 </template>
 
 <script setup>
