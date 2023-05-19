@@ -1,86 +1,103 @@
 <template>
-  <div
-    v-if="type === 1"
-    class="flex items-start aspect-[1/1.32] overflow-hidden bg-slate-300 hover:ring-2 ring-[#3258E8] ring-offset-8 p-10 rounded-xl duration-300 ease-in-out relative"
-  >
-    <div
-      class="absolute left-0 bottom-0 w-full h-full bg-gradient-to-t from-black to-transparent z-0 opacity-80"
-    ></div>
-    <div class="self-end flex flex-col z-10">
-      <h3 class="text-lg font-bold text-white">{{ props.package }}</h3>
-      <p>
-        Start From <span>{{ props.price }}</span> Rupiah
-      </p>
-    </div>
-  </div>
+  <div>
+    <!-- {{ package }} -->
 
-  <div v-if="type === 2">
     <div class="shadow-lg py-8 px-10 rounded-lg flex flex-col gap-6">
       <div class="flex flex-col gap-4">
         <h1 class="text-3xl font-semibold text-slate-600">
-          Indonesian <br />
-          Wedding
+          {{ package.attributes.packageName }}
         </h1>
-        <span class="text-slate-400 text-base"
-          >Suitable for you who like <br />
-          indonesian's wedding</span
-        >
-        <span class="text-sm text-slate-400 flex items-end gap-1">
-          <span class="text-3xl font-semibold text-black">
-            {{ price }}
-          </span>
-          Rupiah</span
-        >
+        <span class="text-slate-400 text-base">{{
+          package.attributes.descriptionPackage
+        }}</span>
+
+        <ClientOnly>
+          <span class="text-sm text-slate-400 flex items-end gap-1">
+            <span class="text-3xl font-semibold text-black">
+              {{
+                Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(totalPrice)
+              }}
+            </span>
+            Rupiah</span
+          >
+        </ClientOnly>
       </div>
 
       <ul class="flex flex-col gap-4 pt-6">
-        <li
-          v-for="(el, idx) in props.description"
-          :key="idx"
-          class="flex gap-6"
-        >
+        <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
-          <span>{{ el }}</span>
+          <span
+            >{{
+              Object.keys(package.attributes.photographer).length
+            }}
+            Photographer to capture your moment</span
+          >
         </li>
-      </ul>
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            Venue with capacity of
+            {{ package.attributes.venue.data.attributes.capacity }} people</span
+          >
+        </li>
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            {{ package.attributes.make_up_artists.data.length }} Expert makeup
+            artistry for brides.</span
+          >
+        </li>
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            {{ package.attributes.master_ceremonies.data.length }} MCs for
+            double the wedding magic</span
+          >
+        </li>
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            {{ Object.keys(package.attributes.catering).length }} Tantalizing
+            wedding catering.</span
+          >
+        </li>
 
-      <Button :type="4" button-text="View Package" />
-    </div>
-  </div>
-
-  <div v-if="type === 3">
-    <div
-      class="shadow-lg py-8 px-10 rounded-lg flex flex-col gap-6 bg-[#14182B]"
-    >
-      <div class="flex flex-col gap-4">
-        <h1 class="text-3xl font-semibold text-white">
-          Indonesian <br />
-          Wedding
-        </h1>
-        <span class="text-base text-[#727583]"
-          >Suitable for you who like <br />
-          indonesian's wedding</span
-        >
-        <span class="text-sm text-[#727583] flex items-end gap-1">
-          <span class="text-3xl font-semibold text-white">
-            {{ price }}
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            {{
+              package.attributes.decoration_vendors.data[0].attributes.themes
+                .length
+            }}
+            Decoration themes for you to choose!
           </span>
-          Rupiah</span
-        >
-      </div>
-
-      <ul class="flex flex-col gap-4 pt-6 text-[#727583]">
-        <li
-          v-for="(el, idx) in props.description"
-          :key="idx"
-          class="flex gap-6"
-        >
-          <CheckCircleIcon class="w-5 fill-[#EA349E] stroke-white" />
-          <span>{{ el }}</span>
         </li>
       </ul>
+      <span
+        >Didn't match with the package? <br />
+        <br />
+        you can customize the package that suits you the most with the base
+        price of
+        <strong class="text-xl">
+          {{
+            Intl.NumberFormat("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            }).format(package.attributes.basePrice)
+          }}
+        </strong></span
+      >
 
-      <Button :type="5" button-text="View Package" />
+      <NuxtLink :to="`/package/${package.attributes.Slug}`">
+        <button
+          class="w-full bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-28 py-3"
+        >
+          View Package
+        </button>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -89,22 +106,45 @@
 import { CheckCircleIcon } from "@heroicons/vue/24/solid";
 const props = defineProps({
   package: {
-    type: String,
+    type: Object,
     required: true,
   },
-  price: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: Number,
-    required: true,
-  },
-  description: {
+  catering: {
     type: Object,
     required: true,
   },
 });
+const totalPrice = computed(() => {
+  const totalCaterings = props.catering.data?.attributes.food.reduce(
+    (acc, element) => {
+      return acc + element.price * element.stok;
+    },
+    0
+  );
+
+  const totalMC = props.package.attributes.master_ceremonies.data.reduce(
+    (acc, element) => {
+      return acc + element.attributes.price;
+    },
+    0
+  );
+
+  const totalMUA = props.package.attributes.make_up_artists.data.reduce(
+    (acc, element) => {
+      return acc + element.attributes.price;
+    },
+    0
+  );
+  return (
+    Number(props.package.attributes.basePrice) +
+    Number(totalCaterings) +
+    Number(totalMC) +
+    Number(totalMUA) +
+    Number(props.package.attributes.photographer.data?.attributes.price) +
+    Number(props.package.attributes.venue.data?.attributes.price)
+  );
+});
+const emit = defineEmits(["redirect"]);
 </script>
 
 <style></style>

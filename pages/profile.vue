@@ -17,10 +17,6 @@ const { data: userData } = await useFetch(
 </script>
 
 <template>
-  <!-- <div
-    class="fixed min-h-screen left-[2%] scale-125 w-10 top-0 bg-rose-400/50 to-gradient-blue/50 blur-[50px] z-0"
-  ></div> -->
-
   <div class="flex flex-col gap-4 justify-start w-full group py-20">
     <div class="flex flex-col gap-4 justify-start w-full group">
       <div class="flex justify-between items-center">
@@ -84,9 +80,19 @@ const { data: userData } = await useFetch(
                 </td>
               </ClientOnly>
               <td class="px-6 py-4">
-                <div class="flex items-center" v-if="el.payStatus === false">
+                <div
+                  class="flex items-center"
+                  v-if="el.payStatus === 'not pay'"
+                >
                   <div class="h-2.5 w-2.5 rounded-full bg-rose-300 mr-2"></div>
                   Not Payed
+                </div>
+                <div
+                  class="flex items-center"
+                  v-else-if="el.payStatus === 'pending'"
+                >
+                  <div class="h-2.5 w-2.5 rounded-full bg-gray-300 mr-2"></div>
+                  Pending Payment
                 </div>
                 <div class="flex items-center" v-else>
                   <div

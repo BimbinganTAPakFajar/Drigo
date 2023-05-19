@@ -2,7 +2,7 @@
 definePageMeta({
   layout: "package",
 });
-
+const config = useRuntimeConfig();
 let descList = ref([
   "Outdoor Wedding",
   "Around 200 People",
@@ -11,6 +11,10 @@ let descList = ref([
   "1 Make up Artist",
   "Indonesian's Tribe Decoration",
 ]);
+
+const { data: dataPackage, pending } = await useLazyFetch(
+  `${config.public.strapiEndpoint}/packages?populate=*`
+);
 </script>
 
 <template>
@@ -33,10 +37,23 @@ let descList = ref([
         alt="bolb"
       />
     </div>
-    <div class="flex gap-10 items-start flex-wrap justify-between">
-      <CardPackage :type="2" :description="descList" :price="`10.000.000`" />
-      <CardPackage :type="2" :description="descList" :price="`10.000.000`" />
-      <CardPackage :type="3" :description="descList" :price="`10.000.000`" />
+
+    <div
+      v-if="pending"
+      class="absolute right-1/2 bottom-1/2 transform translate-x-1/2 translate-y-1/2"
+    >
+      <div
+        class="border-t-transparent border-solid animate-spin rounded-full border-blue-400 border-8 h-64 w-64"
+      ></div>
+    </div>
+
+    <div v-else class="flex gap-10 items-start justify-between">
+      <CardPackage
+        v-for="el in dataPackage.data"
+        :key="el.id"
+        :package="el"
+        :catering="el.attributes.catering"
+      />
     </div>
 
     <FAQ />

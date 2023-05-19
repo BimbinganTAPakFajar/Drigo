@@ -1,29 +1,57 @@
 <template>
-  <div class="justify-center flex items-center flex-col gap-32 max-w-screen-lg">
+  <div
+    class="justify-center flex items-center flex-col gap-32 max-w-screen-lg w-[50%] mx-auto py-20"
+  >
     <!-- Stats Crew-->
-
+    <!-- {{ Crew }} -->
     <div
       v-if="openCrew === true"
-      class="fixed flex flex-col text-black left-[5%] top-1/2 -translate-y-1/2 gap-10 text-justify"
+      class="fixed hidden lg:flex flex-col text-black left-[5%] top-1/2 -translate-y-1/2 gap-10 text-justify"
     >
-      <div class="flex flex-col gap-2 w-64">
-        <h2 class="text-xl font-semibold">100+ unique visions</h2>
+      <div class="flex flex-col gap-2 w-64" v-if="Order.data.length > 0">
+        <h2 class="text-xl font-semibold">
+          {{ Order.data.length }} unique visions
+        </h2>
         <p class="text-[#666666] text-base font-light">
           of our clients through our bespoke projects
         </p>
       </div>
       <div class="flex flex-col gap-2 w-64">
-        <h2 class="text-xl font-semibold">35+ gifted individuals</h2>
+        <h2 class="text-xl font-semibold">
+          {{
+            Crew.data.attributes.photographers.data.length +
+            Crew.data.attributes.venues.data.length +
+            Crew.data.attributes.master_ceremonies.data.length +
+            Crew.data.attributes.make_up_artists.data.length +
+            Crew.data.attributes.caterings.data.length
+          }}
+          gifted individuals
+        </h2>
         <p class="text-[#666666] text-base font-light">
           who are dedicated to crafting a wedding that is nothing short of
           extraordinary
         </p>
       </div>
-      <div class="flex flex-col gap-2 w-64">
-        <h2 class="text-xl font-semibold">120 unique visions</h2>
-        <p class="text-[#666666] text-base font-light">
-          of our clients through our bespoke projects
-        </p>
+      <div
+        @click="openCrew = false"
+        class="cursor-pointer flex gap-6 group items-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-4 h-4"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+          />
+        </svg>
+
+        <p class="group-hover:-ml-2 duration-300 ease-in-out">Close</p>
       </div>
     </div>
     <!-- End Stats Crew-->
@@ -31,7 +59,7 @@
     <div
       @click="openCrew = true"
       v-if="openCrew === false"
-      class="fixed flex flex-col text-black left-[7%] bottom-[7%] gap-10 text-justify"
+      class="fixed flex flex-col text-black left-[7%] bottom-1/3 gap-10 text-justify"
     >
       <Button :type="3" buttonText="Our Statistic" />
     </div>
@@ -49,18 +77,21 @@
     <div class="w-full h-[1px] bg-[#666666] rounded-full"></div>
 
     <div class="flex flex-col gap-10 w-full items-start">
-      <h2 class="text-[#666666] font-semibold text-xl self-start">
-        {{ data.aboutTitle }}
-      </h2>
-      <article class="text-justify tracking-wider leading-loose font-medium">
-        {{ data.aboutDesc }}
+      <article
+        class="prose prose-xl text-justify tracking-wider leading-loose font-medium"
+      >
+        <h2 class="text-[#666666] font-semibold text-xl self-start">
+          {{ data.data.attributes.aboutTitle }}
+        </h2>
+
+        <Markdown :source="data.data.attributes.aboutDesc" />
       </article>
     </div>
     <!-- Timeline -->
     <div class="flex flex-col gap-10">
       <div
         class="items-start flex w-full flex-col gap-6"
-        v-for="(el, idx) in data.history"
+        v-for="(el, idx) in data.data.attributes.history"
         :key="idx"
       >
         <h2 class="text-3xl font-semibold text-[#725AE4] tracking-wider">
@@ -70,13 +101,15 @@
           class="text-2xl font-semibold text-[#666666] flex gap-4 items-center"
         >
           {{ el.title }}
-          <span v-html="el.icon"></span>
         </h4>
         <p class="text-black text-lg font-medium text-justify">
           {{ el.description }}
         </p>
         <p class="text-black">{{ el.length }}</p>
-        <div class="w-full items-start justify-start" v-if="idx !== count - 1">
+        <div
+          class="w-full items-start justify-start"
+          v-if="idx !== data.data.attributes.history.length - 1"
+        >
           <div
             class="h-20 w-[2px] relative bg-[#725AE4] justify-start flex items-start"
           >
@@ -98,9 +131,104 @@
         We've been searching all over the place to bring the best team to serve
         you on your wedding, meet them
       </p>
+
       <ArrowTrendingDownIcon class="w-12 aspect-square animate-bounce" />
-      <div class="w-full flex flex-wrap gap-10 justify-start items-start">
-        <CardCrew name="Drigo Alexander" job="Photographer" :skill="skill" />
+      <div class="w-full flex flex-col gap-36 justify-start items-start">
+        <div class="flex flex-col gap-10 w-full">
+          <h1 class="text-2xl font-bold tracking-wider">Photographer</h1>
+          <div class="w-full h-[1px] bg-black"></div>
+          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+            <div
+              class="tooltip"
+              :data-tip="`Click to see ${el.attributes.name} work`"
+              v-for="el in Crew.data.attributes.photographers.data"
+              :key="el.id"
+            >
+              <NuxtLink
+                target="_blank"
+                :to="`${el.attributes.portofolioLink}`"
+                class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
+              >
+                {{ el.attributes.name }}
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-10 w-full">
+          <h1 class="text-2xl font-bold tracking-wider">Make Up Artist</h1>
+          <div class="w-full h-[1px] bg-black"></div>
+          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+            <div
+              class="tooltip"
+              :data-tip="`Click to see ${el.attributes.name} work`"
+              v-for="el in Crew.data.attributes.make_up_artists.data"
+              :key="el.id"
+            >
+              <NuxtLink
+                target="_blank"
+                :to="`${el.attributes.portofolioLink}`"
+                class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
+              >
+                {{ el.attributes.name }}
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-10 w-full">
+          <h1 class="text-2xl font-bold tracking-wider">
+            Master of Ceremonies
+          </h1>
+          <div class="w-full h-[1px] bg-black"></div>
+          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+            <div
+              v-for="el in Crew.data.attributes.master_ceremonies.data"
+              :key="el.id"
+            >
+              <h1
+                class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
+              >
+                {{ el.attributes.Name }}
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-10 w-full">
+          <h1 class="text-2xl font-bold tracking-wider">Caterings</h1>
+          <div class="w-full h-[1px] bg-black"></div>
+          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+            <div v-for="el in Crew.data.attributes.caterings.data" :key="el.id">
+              <h1
+                class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
+              >
+                {{ el.attributes.name }}
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-10 w-full">
+          <h1 class="text-2xl font-bold tracking-wider">Photographer</h1>
+          <div class="w-full h-[1px] bg-black"></div>
+          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+            <div
+              class="tooltip"
+              :data-tip="`Click to see ${el.attributes.venueName} venue`"
+              v-for="el in Crew.data.attributes.venues.data"
+              :key="el.id"
+            >
+              <NuxtLink
+                target="_blank"
+                :to="`${el.attributes.venueLink}`"
+                class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
+              >
+                {{ el.attributes.venueName }}
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -109,20 +237,28 @@
 </template>
 
 <script setup>
+import { ArrowTrendingDownIcon } from "@heroicons/vue/24/outline";
+
 const config = useRuntimeConfig();
-const skill = ["Excellent Angle Photo", "Great Color Grading"];
 const openCrew = ref(false);
+import Markdown from "vue3-markdown-it";
+definePageMeta({ layout: "index" });
 
-let data = ref({});
-let count = ref();
-await $fetch(`${config.strapiEndpoint}/about-us`, {
-  method: "get",
-})
-  .then((res) => {
-    data = res.data.attributes;
-    count = res.data.attributes.history.length;
-  })
-  .catch((err) => console.log(err));
+const { data, error } = useLazyFetch(
+  `${config.public.strapiEndpoint}/about-us?populate=*`,
+  {
+    method: "GET",
+  }
+);
 
-definePageMeta({ layout: "no-footer" });
+const { data: Crew, error: errorCrew } = useLazyFetch(
+  `${config.public.strapiEndpoint}/identifiers/2?populate=*`,
+  {
+    method: "GET",
+  }
+);
+
+const { data: Order, error: errorOrder } = useLazyFetch(
+  `${config.public.strapiEndpoint}/orders?populate=*`
+);
 </script>

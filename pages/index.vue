@@ -66,12 +66,12 @@
     <!-- Choose Package -->
     <div class="flex items-center justify-evenly gap-20">
       <div class="flex gap-10">
-        <CardPackage
+        <!-- <CardPackage
           v-for="(el, idx) in cardPackage"
           :key="idx"
           :package="el.package"
           :price="el.price"
-        />
+        /> -->
       </div>
 
       <div class="flex flex-col gap-6 items-start">
@@ -185,8 +185,6 @@
 </template>
 
 <script setup>
-import { useParallax } from "@vueuse/core";
-
 definePageMeta({ layout: "index" });
 const config = useRuntimeConfig();
 const token = useCookie("token");
@@ -195,9 +193,6 @@ const id = useCookie("id");
 let data = ref({});
 let image = ref({});
 let errCode = ref();
-
-const parallaxImage = ref(null);
-const { tilt, roll, source } = useParallax(parallaxImage);
 
 await $fetch(`${config.strapiEndpoint}/landing-page?populate=*`, {
   method: "get",
@@ -219,17 +214,8 @@ if (token.value) {
     },
   });
 
-  const layer0 = computed(() => ({
-    transform: `translateX(${tilt * 10}px) translateY(${
-      roll * 10
-    }px) scale(1.33)`,
-  }));
-
   id.value = user.id;
   if (!role.value) {
-    // let encode = btoa(user.identifier.id)
-    // console.log(encode)
-    // role.value = encode
     role.value = user.identifier.id;
   }
 }

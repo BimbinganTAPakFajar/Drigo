@@ -3,7 +3,6 @@ import "vue3-carousel/dist/carousel.css";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import { ArrowSmallRightIcon, PlayIcon } from "@heroicons/vue/24/outline";
 import * as V from "v-calendar";
-import { Twilio } from "twilio";
 
 import "v-calendar/style.css";
 definePageMeta({
@@ -18,12 +17,37 @@ const today = ref(new Date());
 const minDate = today.value.setMonth(today.value.getMonth() + 9);
 const maxDate = new Date().setMonth(new Date().getMonth() + 11);
 
+// const url = `https://api.twilio.com/2010-04-01/Accounts/${config.public.accountSID}/Messages.json`;
+
+// const headers = new Headers();
+// headers.set(
+//   "Authorization",
+//   `Basic ${btoa(`${config.public.accountSID}:${config.public.authToken}`)}`
+// );
+// headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+// const formData = new URLSearchParams();
+// formData.set("To", "whatsapp:+6287887151500");
+// formData.set("From", " whatsapp:+85156905652");
+// formData.set("Body", "test");
+
+// const options = {
+//   method: "POST",
+//   headers,
+//   body: formData,
+// };
+
+// await $fetch(url, options)
+//   .then((response) => response.json())
+//   .then((data) => console.log(data))
+//   .catch((error) => console.error(error));
+
 useHead({
   script: [
     {
       type: "text/javascript",
       src: "https://app.sandbox.midtrans.com/snap/snap.js",
-      "data-client-key": config.midtransClientKey,
+      "data-client-key": config.public.midtransClientKey,
     },
   ],
 });
@@ -48,8 +72,12 @@ let photographerIndex = ref(0);
 let cateringIndex = ref(0);
 let MUAIndex = ref(0);
 let arrayMUA = ref([]);
+let arrayPhotographer = ref([]);
+let arrayCatering = ref([]);
+let arrayVenue = ref([]);
 let packageID = ref();
 const basePrice = ref();
+let loading = ref(false);
 
 // Form Submition
 let formSubmitPackage = ref({
@@ -90,7 +118,7 @@ function getMUAIndex(idx) {
 
 // Fetch Data
 await $fetch(
-  `${config.strapiEndpoint}/packages?filters[slug]=${route.params.slug}&populate=*`,
+  `${config.public.strapiEndpoint}/packages?filters[slug]=${route.params.slug}&populate=*`,
   {
     method: "GET",
     headers: {
@@ -100,43 +128,45 @@ await $fetch(
 ).then((res) => {
   packageID.value = res.data[0].id;
   packageDetail.value = res;
-
   basePrice.value = res.data[0].attributes.basePrice;
-
   formSubmitPackage.value.make_up_artists =
     res.data[0].attributes.make_up_artists.data;
-
   arrayMUA.value = res.data[0].attributes.make_up_artists.data.map(
     (el) => el.id
   );
 
+  arrayPhotographer.value.push(res.data[0].attributes.photographer.data.id);
+  arrayCatering.value.push(res.data[0].attributes.catering.data.id);
+  arrayVenue.value.push(res.data[0].attributes.venue.data.id);
+
   formSubmitPackage.value.master_ceremonies =
     res.data[0].attributes.master_ceremonies.data.map((el) => el.id);
   formSubmitPackage.value.photographer =
-    res.data[0].attributes.photographers.data;
-  formSubmitPackage.value.caterings = res.data[0].attributes.caterings.data;
+    res.data[0].attributes.photographer.data;
+  formSubmitPackage.value.caterings = res.data[0].attributes.catering.data;
   formSubmitPackage.value.venue = res.data[0].attributes.venue.data;
 });
 
 let decorationVendor = ref();
 
-await $fetch(`${config.strapiEndpoint}/decoration-vendors`, {
+await $fetch(`${config.public.strapiEndpoint}/decoration-vendors`, {
   headers: {
     Authorization: "Bearer " + token,
   },
 }).then((res) => {
+  console.log(res);
   (decorationVendor.value = res),
-    (themeName.value = res.data[0].attributes.themes[0].theme);
-  themeArray.value = res.data[0].attributes.themes;
+    (themeArray.value = res.data.map((el) => el.attributes.theme));
+  console.log(themeArray.value);
 });
 
-await $fetch(`${config.strapiEndpoint}/venues?populate=*`, {
+await $fetch(`${config.public.strapiEndpoint}/venues?populate=*`, {
   headers: {
     Authorization: "Bearer " + token,
   },
 }).then((res) => (venue.value = res.data));
 
-await $fetch(`${config.strapiEndpoint}/photographers?populate=*`, {
+await $fetch(`${config.public.strapiEndpoint}/photographers?populate=*`, {
   headers: {
     Authorization: "Bearer " + token,
   },
@@ -146,13 +176,16 @@ const {
   data: MUA,
   pending,
   error,
-} = await useFetch(`${config.strapiEndpoint}/make-up-artists?populate=*`, {
-  headers: {
-    Authorization: "Bearer " + token,
-  },
-});
+} = await useFetch(
+  `${config.public.strapiEndpoint}/make-up-artists?populate=*`,
+  {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  }
+);
 
-await $fetch(`${config.strapiEndpoint}/caterings?populate=*`, {
+await $fetch(`${config.public.strapiEndpoint}/caterings?populate=*`, {
   headers: {
     Authorization: "Bearer " + token,
   },
@@ -160,25 +193,30 @@ await $fetch(`${config.strapiEndpoint}/caterings?populate=*`, {
 
 // Get Theme Price
 
-const price = computed(() => {
-  return themeArray.value.filter((el) => el.theme == themeName.value);
+const themePrice = computed(() => {
+  return decorationVendor.value.data.filter(
+    (el) => el.attributes.theme == themeName.value
+  );
 });
 
 // get default photographer of package
 const defaultPhotographer = computed(() => {
   const photographerIds = photographer.value.map((el) => el.id);
-  return formSubmitPackage.value.photographer.filter((el) =>
-    photographerIds.includes(el.id)
-  );
+  const photographers = Array.isArray(formSubmitPackage.value.photographer)
+    ? formSubmitPackage.value.photographer
+    : [formSubmitPackage.value.photographer];
+
+  return photographers.filter((el) => photographerIds.includes(el.id));
 });
 
 // get default catering of package
 const defaultCatering = computed(() => {
   const cateringIds = catering.value.map((el) => el.id);
+  const cateringsArray = Array.isArray(formSubmitPackage.value.caterings)
+    ? formSubmitPackage.value.caterings
+    : [formSubmitPackage.value.caterings];
 
-  return formSubmitPackage.value.caterings.filter((el) =>
-    cateringIds.includes(el.id)
-  );
+  return cateringsArray.filter((el) => cateringIds.includes(el.id));
 });
 
 // Total Price
@@ -190,16 +228,20 @@ const totalPrice = computed(() => {
       return arrayMUA.value.includes(el.id);
     });
 
-    let totalPhotographerPrice = Number(
-      availablePhotographers.value[photographerIndex.value].attributes.price
-    );
-    let totalCateringPrice = availableCaterings.value[
-      cateringIndex.value
-    ].attributes.food.reduce((acc, element) => {
-      return acc + element.price * element.stok;
-    }, 0);
-    let totalVenuePrice = Number(
-      availableVenue.value[venueIndex.value].attributes.price
+    let photoArray = availablePhotographers.value.filter((el) => {
+      return arrayPhotographer.value.includes(el.id);
+    });
+    let cateringArray = availableCaterings.value.filter((el) => {
+      return arrayCatering.value.includes(el.id);
+    });
+    let venueArray = availableVenue.value.filter((el) => {
+      return arrayVenue.value.includes(el.id);
+    });
+    let totalCateringPrice = cateringArray[0].attributes.food.reduce(
+      (acc, element) => {
+        return acc + element.price * element.stok;
+      },
+      0
     );
     let totalMcPrice = mcArray.reduce((acc, element) => {
       return acc + element.attributes.price;
@@ -213,9 +255,9 @@ const totalPrice = computed(() => {
       basePrice.value +
       totalMcPrice +
       totalMUA +
-      price.value[0].price +
-      totalPhotographerPrice +
-      totalVenuePrice +
+      // Number(themePrice[0]?.attributes?.price)  +
+      Number(photoArray[0].attributes.price) +
+      Number(venueArray[0].attributes.price) +
       totalCateringPrice
     );
   } else {
@@ -224,16 +266,20 @@ const totalPrice = computed(() => {
       return arrayMUA.value.includes(el.id);
     });
 
-    let totalPhotographerPrice = Number(
-      availablePhotographers.value[photographerIndex.value].attributes.price
-    );
-    let totalCateringPrice = availableCaterings.value[
-      cateringIndex.value
-    ].attributes.food.reduce((acc, element) => {
-      return acc + element.price * element.stok;
-    }, 0);
-    let totalVenuePrice = Number(
-      availableVenue.value[venueIndex.value].attributes.price
+    let photoArray = availablePhotographers.value.filter((el) => {
+      return arrayPhotographer.value.includes(el.id);
+    });
+    let cateringArray = availableCaterings.value.filter((el) => {
+      return arrayCatering.value.includes(el.id);
+    });
+    let venueArray = availableVenue.value.filter((el) => {
+      return arrayVenue.value.includes(el.id);
+    });
+    let totalCateringPrice = cateringArray[0].attributes.food.reduce(
+      (acc, element) => {
+        return acc + element.price * element.stok;
+      },
+      0
     );
     let totalMcPrice = mcArray.reduce((acc, element) => {
       return acc + element.attributes.price;
@@ -242,9 +288,9 @@ const totalPrice = computed(() => {
     return Number(
       basePrice.value +
         totalMcPrice +
-        price.value[0].price +
-        totalPhotographerPrice +
-        totalVenuePrice +
+        // themePrice[0]?.attributes?.price +
+        Number(photoArray[0].attributes.price) +
+        Number(venueArray[0].attributes.price) +
         totalCateringPrice
     );
   }
@@ -350,8 +396,9 @@ function availCatering() {
 
 // Submit Order
 function submitOrder() {
+  loading.value = true;
   const { data: submitResponseData, pending: pendingSubmitData } = useLazyFetch(
-    `${config.strapiEndpoint}/orders`,
+    `${config.public.strapiEndpoint}/orders?populate=*`,
     {
       method: "POST",
       headers: {
@@ -379,16 +426,102 @@ function submitOrder() {
           },
           totalPrice: totalPrice.value,
           Date: today.value.toISOString().split("T")[0].split("-").join("-"),
-          users_permissions_user: {
+          user: {
             id: id.value,
           },
         },
       },
     }
-  ).then(window.location.reload());
+  ).then((res) => {
+    const id = res.data.value.data.id;
+    // console.log(res.data.value.data.attributes.user);
+    useFetch("/api/midtrans", {
+      method: "POST",
+      body: {
+        transaction_details: {
+          order_id: res.data.value.data.attributes.uuid,
+          gross_amount: res.data.value.data.attributes.totalPrice,
+        },
+        credit_card: {
+          secure: true,
+        },
+        customer_details: {
+          first_name:
+            res.data.value.data.attributes.user.data.attributes.username,
+          email: res.data.value.data.attributes.user.data.attributes.email,
+          phone:
+            res.data.value.data.attributes.user.data.attributes.phoneNumber,
+        },
+      },
+    }).then((res) => {
+      // console.log(res.data.value.data.token);
+      window.snap.pay(res.data.value.data.token, {
+        onSuccess: function (result) {
+          /* You may add your own implementation here */
+          console.log(result);
+          useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
+            method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+            body: {
+              data: {
+                payStatus: result.transaction_status,
+              },
+            },
+          }).then(navigateTo("/profile"));
+        },
+        onPending: function (result) {
+          /* You may add your own implementation here */
+          console.log(result);
+          useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
+            method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+            body: {
+              data: {
+                payStatus: "Payed",
+              },
+            },
+          }).then(navigateTo("/profile"));
+        },
+        onError: function (result) {
+          useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
+            method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+            body: {
+              data: {
+                payStatus: result.transaction_status,
+              },
+            },
+          }).then(navigateTo("/profile"));
+          console.log(result);
+        },
+        onClose: function (result) {
+          /* You may add your own implementation here */
+          useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }).then((loading.value = false));
+          alert("you closed the popup without finishing the payment");
+          console.log(result);
+        },
+      });
+    });
+    // .then(window.location.reload());
+  });
 
-  return { submitResponseData, pendingSubmitData };
+  return {
+    submitResponseData,
+    pendingSubmitData,
+  };
 }
+
 // End Submit Order
 
 // Run at initial
@@ -456,6 +589,26 @@ watch(
         class="z-30 fixed left-1/4 top-1/4 flex flex-col gap-14 max-w-fit min-w-fit"
         v-if="modalOpen"
       >
+        <div
+          v-if="loading === true"
+          class="fixed left-0 top-0 w-full h-screen bg-black/50 flex items-center justify-center"
+        >
+          <span class="relative inline-flex">
+            <div
+              class="cursor-wait inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-sky-500 bg-slate-800 transition ease-in-out duration-150 ring-1 ring-slate-900/10 dark:ring-slate-200/20"
+            >
+              Wait for payment
+            </div>
+            <span class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
+              ></span>
+            </span>
+          </span>
+        </div>
         <h1 class="text-4xl font-semibold w-fit">Total Price</h1>
         <span class="text-7xl font-bold w-fit"
           >{{
@@ -871,6 +1024,7 @@ watch(
             </div>
             <!-- Decoration Vendors -->
           </div>
+
           <div class="flex items-start gap-6 w-full justify-between">
             <div class="flex flex-col gap-4 justify-start w-full group">
               <div class="flex justify-between items-center">
@@ -893,14 +1047,13 @@ watch(
                 class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
               >
                 <option
-                  v-for="(el, idx) in decorationVendor.data[0].attributes
-                    .themes"
+                  v-for="(el, idx) in decorationVendor.data"
                   :key="idx"
-                  :selected="idx === 0"
-                  :value="el.theme"
+                  :selected="idx == 0"
+                  :value="el.attributes.theme"
                 >
-                  <!-- {{ el.attributes.theme }} -->
-                  {{ el.theme }}
+                  {{ el.attributes.theme }}
+                  <!-- {{ el }} -->
                 </option>
               </select>
 
@@ -913,7 +1066,7 @@ watch(
                     Intl.NumberFormat("id", {
                       style: "currency",
                       currency: "IDR",
-                    }).format(price[0].price)
+                    }).format(themePrice[0]?.attributes?.price)
                   }}
                 </div>
               </div>
@@ -935,122 +1088,164 @@ watch(
                 </div>
               </div>
               <div class="h-[1px] w-full bg-slate-700"></div>
-              <div class="flex flex-col gap-20 w-full">
-                <div class="flex flex-col gap-6">
-                  <span class="font-bold text-xl"
-                    >Choose photographer from the list
-                  </span>
-                  <ul class="flex gap-14 flex-row capitalize">
+              <div class="flex flex-row gap-6 w-full">
+                <div class="flex flex-col gap-6 flex-grow w-1/4">
+                  <div class="w-full text-xl font-bold">
+                    Choose your photographer by click the button below
+                  </div>
+                  <ul
+                    class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
                     <li
-                      v-for="(el, idx) in availablePhotographers"
-                      :key="idx"
-                      :class="{
-                        'text-gradient-pink': idx === photographerIndex,
-                      }"
-                      class="cursor-pointer duration-300 ease-in-out capitalize"
-                      @click="getPhotographerIndex(idx)"
+                      class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600"
+                      v-for="el in availablePhotographers"
+                      :key="el.id"
                     >
-                      {{ el.attributes.user.data.attributes.username }}
+                      <div class="flex items-center pl-3">
+                        <input
+                          id="default-radio-1"
+                          type="radio"
+                          @click="arrayPhotographer[0] = el.id"
+                          :checked="arrayPhotographer.includes(el.id)"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                        />
+                        <label
+                          for="default-radio-1"
+                          class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                          >{{ el.attributes.name }}
+                          <span
+                            class="text-gray-500 font-light"
+                            v-if="
+                              packageDetail.data[0].attributes.photographer.data
+                                .id === el.id
+                            "
+                            >Package Default</span
+                          >
+                        </label>
+                      </div>
                     </li>
                   </ul>
                 </div>
-                <div class="flex gap-32 w-full h-80">
-                  <div class="flex flex-col gap-10 w-1/4 justify-between">
-                    <div
-                      class="w-full text-6xl font-bold capitalize flex flex-col"
-                    >
-                      {{
-                        availablePhotographers[photographerIndex].attributes
-                          .user.data.attributes.username
-                      }}
-                      <div
-                        v-for="(element, idx) in defaultPhotographer"
+                <!-- Separator -->
+                <div class="w-[1px] min-h-full bg-black"></div>
+                <!-- End Separator -->
+                <div class="flex flex-col gap-20 w-3/4">
+                  <div class="flex flex-col gap-6">
+                    <span class="font-bold text-xl"
+                      >Choose photographer from the list
+                    </span>
+                    <ul class="flex gap-14 flex-row capitalize">
+                      <li
+                        v-for="(el, idx) in availablePhotographers"
                         :key="idx"
+                        :class="{
+                          'text-gradient-pink': idx === photographerIndex,
+                        }"
+                        class="cursor-pointer duration-300 ease-in-out capitalize"
+                        @click="getPhotographerIndex(idx)"
                       >
-                        <span
-                          v-if="
-                            availablePhotographers[photographerIndex].id ===
-                            element.id
-                          "
-                          class="text-gray-400 text-sm"
-                          >Default Package Photographer</span
+                        {{ el.attributes.name }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="flex gap-32 w-full h-80">
+                    <div class="flex flex-col gap-10 w-1/4 justify-between">
+                      <div
+                        class="w-full text-6xl font-bold capitalize flex flex-col"
+                      >
+                        {{
+                          availablePhotographers[photographerIndex].attributes
+                            .name
+                        }}
+                        <div
+                          v-for="(element, idx) in defaultPhotographer"
+                          :key="idx"
                         >
+                          <span
+                            v-if="
+                              availablePhotographers[photographerIndex].id ===
+                              element.id
+                            "
+                            class="text-gray-400 text-sm"
+                            >Default Package Photographer</span
+                          >
+                        </div>
+                      </div>
+                      <div class="flex flex-col gap-4">
+                        <h6 class="text-gray-600 text-xl font-semibold">
+                          What you should know about
+                          {{
+                            availablePhotographers[photographerIndex].attributes
+                              .name
+                          }}
+                        </h6>
+
+                        <p class="text-gray-500 text-lg text-justify">
+                          {{
+                            availablePhotographers[photographerIndex].attributes
+                              .description
+                          }}
+                        </p>
                       </div>
                     </div>
-                    <div class="flex flex-col gap-4">
-                      <h6 class="text-gray-600 text-xl font-semibold">
-                        What you should know about
-                        {{
-                          availablePhotographers[photographerIndex].attributes
-                            .user.data.attributes.username
-                        }}
-                      </h6>
-
-                      <p class="text-gray-500 text-lg text-justify">
-                        {{
-                          availablePhotographers[photographerIndex].attributes
-                            .description
-                        }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-10 w-1/3">
-                    <div class="flex flex-col gap-4">
-                      <h6 class="text-gray-600 text-xl font-semibold">
-                        What will you get when you hire
-                        {{
-                          availablePhotographers[photographerIndex].attributes
-                            .user.data.attributes.username
-                        }}
-                      </h6>
-
-                      <p class="text-gray-500 text-lg text-justify">
-                        {{
-                          availablePhotographers[photographerIndex].attributes
-                            .serviceProvided
-                        }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col gap-10 justify-between">
-                    <div class="flex flex-col gap-4">
-                      <h6 class="text-gray-600 font-semibold text-2xl">
-                        Price?
-                      </h6>
-
-                      <p
-                        class="py-2 text-justify text-5xl font-bold bg-gradient-to-tr from-gradient-pink/50 text-transparent bg-clip-text to-gradient-blue/50"
-                      >
-                        {{
-                          Intl.NumberFormat("id", {
-                            style: "currency",
-                            currency: "IDR",
-                          }).format(
+                    <div class="flex flex-col gap-10 w-1/3">
+                      <div class="flex flex-col gap-4">
+                        <h6 class="text-gray-600 text-xl font-semibold">
+                          What will you get when you hire
+                          {{
                             availablePhotographers[photographerIndex].attributes
-                              .price
-                          )
-                        }}
-                      </p>
+                              .name
+                          }}
+                        </h6>
+
+                        <p class="text-gray-500 text-lg text-justify">
+                          {{
+                            availablePhotographers[photographerIndex].attributes
+                              .serviceProvided
+                          }}
+                        </p>
+                      </div>
                     </div>
 
-                    <NuxtLink
-                      :to="
-                        availablePhotographers[photographerIndex].attributes
-                          .portofolioLink
-                      "
-                    >
-                      <button
-                        class="bg-gradient-to-tr from-gradient-pink/50 text-transparent bg-clip-text to-gradient-blue/50 duration-300 ease-in-out p-6 border-gradient-pink border-[1px] rounded-bl-2xl shadow-lg rounded-tr-2xl"
-                      >
-                        See
-                        {{
+                    <div class="flex flex-col gap-10 justify-between">
+                      <div class="flex flex-col gap-4">
+                        <h6 class="text-gray-600 font-semibold text-2xl">
+                          Price?
+                        </h6>
+
+                        <p
+                          class="py-2 text-justify text-5xl font-bold bg-gradient-to-tr from-gradient-pink/50 text-transparent bg-clip-text to-gradient-blue/50"
+                        >
+                          {{
+                            Intl.NumberFormat("id", {
+                              style: "currency",
+                              currency: "IDR",
+                            }).format(
+                              availablePhotographers[photographerIndex]
+                                .attributes.price
+                            )
+                          }}
+                        </p>
+                      </div>
+
+                      <NuxtLink
+                        :to="
                           availablePhotographers[photographerIndex].attributes
-                            .user.data.attributes.username
-                        }}
-                        works here!
-                      </button>
-                    </NuxtLink>
+                            .portofolioLink
+                        "
+                      >
+                        <button
+                          class="bg-gradient-to-tr from-gradient-pink/50 text-transparent bg-clip-text to-gradient-blue/50 duration-300 ease-in-out p-6 border-gradient-pink border-[1px] rounded-bl-2xl shadow-lg rounded-tr-2xl"
+                        >
+                          See
+                          {{
+                            availablePhotographers[photographerIndex].attributes
+                              .name
+                          }}
+                          works here!
+                        </button>
+                      </NuxtLink>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1071,106 +1266,150 @@ watch(
                 </div>
               </div>
               <div class="h-[1px] w-full bg-slate-700"></div>
-              <div class="flex flex-col gap-6">
-                <span class="font-bold text-xl"
-                  >Choose catering from the list
-                </span>
-                <ul class="flex gap-14 flex-row capitalize">
-                  <li
-                    v-for="(el, idx) in availableCaterings"
-                    :key="idx"
-                    :class="{
-                      'text-gradient-pink': idx === cateringIndex,
-                    }"
-                    class="cursor-pointer duration-300 ease-in-out capitalize"
-                    @click="getCateringIndex(idx)"
-                  >
-                    <span v-if="el.attributes.user.data !== null">
-                      {{ el.attributes.user.data.attributes.username }}
-                    </span>
-
-                    <span v-else>Blissful Catering</span>
-                  </li>
-                </ul>
-              </div>
-              <div class="flex flex-col gap-20 w-full overflow-y-scroll">
-                <div class="flex w-full gap-10 flex-grow">
-                  <div class="w-1/4">
-                    <div class="stat">
-                      <div class="stat-title">Catering Name</div>
-
-                      <div
-                        v-if="
-                          availableCaterings[cateringIndex].attributes.user
-                            .data !== null
-                        "
-                        class="font-bold text-5xl"
-                      >
-                        {{
-                          availableCaterings[cateringIndex].attributes.user.data
-                            .attributes.username
-                        }}
-                      </div>
-                      <div v-else class="font-bold text-5xl">
-                        Our Crew Catering
-                      </div>
-                    </div>
-
-                    <div class="stat">
-                      <div class="stat-title">Location</div>
-                      <div class="font-bold text-xl">
-                        {{
-                          availableCaterings[cateringIndex].attributes.location
-                        }}
-                      </div>
-
-                      <div
-                        v-for="(element, idx) in defaultCatering"
-                        :key="idx"
-                        class="stats"
-                      >
-                        <span
-                          v-if="
-                            availableCaterings[cateringIndex].id === element.id
-                          "
-                          class="text-[12px] text-gray-400 font-bol"
-                          >Default Catering</span
-                        >
-                      </div>
-                    </div>
+              <div class="flex flex-row gap-10 w-full">
+                <div class="flex flex-col gap-6 flex-grow w-1/4">
+                  <div class="w-full text-xl font-bold">
+                    Choose your catering by click the button below
                   </div>
-
-                  <div class="relative overflow-x-auto w-3/4 rounded-xl h-fit">
-                    <table class="w-full text-sm text-left text-gray-500">
-                      <thead class="text-xs text-gray-700 uppercase">
-                        <tr>
-                          <th scope="col" class="px-6 py-3 rounded-tl-xl">
-                            Food name
-                          </th>
-                          <th scope="col" class="px-6 py-3">Stock</th>
-                          <th scope="col" class="px-6 py-3 rounded-tr-xl">
-                            Price
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(el, idx) in catering[cateringIndex].attributes
-                            .food"
-                          :key="idx"
-                          class="bg-gradient-pink/5 dark:bg-gray-800"
-                        >
-                          <th
-                            scope="row"
-                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  <ul
+                    class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <li
+                      class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600"
+                      v-for="el in availableCaterings"
+                      :key="el.id"
+                    >
+                      <div class="flex items-center pl-3">
+                        <input
+                          id="default-radio-1"
+                          type="radio"
+                          @click="arrayCatering[0] = el.id"
+                          :checked="arrayCatering.includes(el.id)"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                        />
+                        <label
+                          for="default-radio-1"
+                          class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                          >{{ el.attributes.name }}
+                          <span
+                            class="text-gray-500 font-light"
+                            v-if="
+                              packageDetail.data[0].attributes.catering.data
+                                .id === el.id
+                            "
+                            >Package Default</span
                           >
-                            {{ el.food }}
-                          </th>
-                          <td class="px-6 py-4">{{ el.stok }}</td>
-                          <td class="px-6 py-4">{{ el.price }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                        </label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <!-- Separator -->
+                <div class="w-[1px] min-h-full bg-black"></div>
+                <!-- End Separator -->
+                <div class="flex flex-col gap-6 w-3/4">
+                  <div class="flex flex-col gap-6">
+                    <span class="font-bold text-xl"
+                      >See catering from the list
+                    </span>
+                    <ul class="flex gap-14 flex-row capitalize">
+                      <li
+                        v-for="(el, idx) in availableCaterings"
+                        :key="idx"
+                        :class="{
+                          'text-gradient-pink': idx === cateringIndex,
+                        }"
+                        class="cursor-pointer duration-300 ease-in-out capitalize"
+                        @click="getCateringIndex(idx)"
+                      >
+                        <span> {{ el.attributes.name }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="flex flex-col gap-20 w-full overflow-y-scroll">
+                    <div class="flex w-full gap-10 flex-grow">
+                      <div class="w-1/4">
+                        <div class="stat">
+                          <div class="stat-title">Catering Name</div>
+
+                          <div
+                            v-if="
+                              availableCaterings[cateringIndex].attributes.user
+                                .data !== null
+                            "
+                            class="font-bold text-5xl"
+                          >
+                            {{
+                              availableCaterings[cateringIndex].attributes.user
+                                .data.attributes.username
+                            }}
+                          </div>
+                          <div v-else class="font-bold text-5xl">
+                            Our Crew Catering
+                          </div>
+                        </div>
+
+                        <div class="stat">
+                          <div class="stat-title">Location</div>
+                          <div class="font-bold text-xl">
+                            {{
+                              availableCaterings[cateringIndex].attributes
+                                .location
+                            }}
+                          </div>
+
+                          <div
+                            v-for="(element, idx) in defaultCatering"
+                            :key="idx"
+                            class="stats"
+                          >
+                            <span
+                              v-if="
+                                availableCaterings[cateringIndex].id ===
+                                element.id
+                              "
+                              class="text-[12px] text-gray-400 font-bol"
+                              >Default Catering</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        class="relative overflow-x-auto w-3/4 rounded-xl h-fit"
+                      >
+                        <table class="w-full text-sm text-left text-gray-500">
+                          <thead class="text-xs text-gray-700 uppercase">
+                            <tr>
+                              <th scope="col" class="px-6 py-3 rounded-tl-xl">
+                                Food name
+                              </th>
+                              <th scope="col" class="px-6 py-3">Stock</th>
+                              <th scope="col" class="px-6 py-3 rounded-tr-xl">
+                                Price
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="(el, idx) in catering[cateringIndex]
+                                .attributes.food"
+                              :key="idx"
+                              class="bg-gradient-pink/5 dark:bg-gray-800"
+                            >
+                              <th
+                                scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                              >
+                                {{ el.food }}
+                              </th>
+                              <td class="px-6 py-4">{{ el.stok }}</td>
+                              <td class="px-6 py-4">{{ el.price }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1193,23 +1432,64 @@ watch(
               <div class="h-[1px] w-full bg-slate-700"></div>
 
               <div class="flex flex-col gap-14 w-full">
-                <div class="flex flex-col gap-6">
-                  <span class="font-bold text-xl"
-                    >Choose venue from the list
-                  </span>
-                  <ul class="flex gap-14 flex-row capitalize">
-                    <li
-                      v-for="(el, idx) in availableVenue"
-                      :key="idx"
-                      :class="{
-                        'text-gradient-pink': idx === venueIndex,
-                      }"
-                      class="cursor-pointer hover:text-gradient-pink/80 duration-300 ease-in-out"
-                      @click="getVenueIndex(idx)"
+                <div class="flex flex-row gap-10 w-full justify-between">
+                  <div class="flex flex-col gap-6 w-full">
+                    <div class="w-full text-xl font-bold">
+                      Choose your catering by click the button below
+                    </div>
+                    <ul
+                      class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     >
-                      {{ el.attributes.venueName }}
-                    </li>
-                  </ul>
+                      <li
+                        class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600"
+                        v-for="el in availableVenue"
+                        :key="el.id"
+                      >
+                        <div class="flex items-center pl-3">
+                          <input
+                            id="default-radio-1"
+                            type="radio"
+                            @click="arrayVenue[0] = el.id"
+                            :checked="arrayVenue.includes(el.id)"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                          />
+                          <label
+                            for="default-radio-1"
+                            class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                            >{{ el.attributes.venueName }}
+                            <span
+                              class="text-gray-500 font-light"
+                              v-if="
+                                packageDetail.data[0].attributes.venue.data
+                                  .id === el.id
+                              "
+                              >Package Default</span
+                            >
+                          </label>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Separator -->
+                  <div class="w-[1px] min-h-full bg-black"></div>
+                  <div class="flex flex-col gap-6 w-full">
+                    <span class="font-bold text-xl"
+                      >See venue from the list
+                    </span>
+                    <ul class="flex gap-14 flex-row capitalize">
+                      <li
+                        v-for="(el, idx) in availableVenue"
+                        :key="idx"
+                        :class="{
+                          'text-gradient-pink': idx === venueIndex,
+                        }"
+                        class="cursor-pointer hover:text-gradient-pink/80 duration-300 ease-in-out"
+                        @click="getVenueIndex(idx)"
+                      >
+                        {{ el.attributes.venueName }}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-10 lg:gap-24">
@@ -1218,8 +1498,6 @@ watch(
                   >
                     <div class="pl-6 flex flex-col gap-4">
                       <div class="stat-title">Venue Name</div>
-                      <!-- {{ venue[venueIndex].attributes }} -->
-                      {{ formSubmitPackage.venue.id }}
                       <div class="font-bold text-5xl">
                         {{ availableVenue[venueIndex].attributes.venueName }}
                       </div>
@@ -1245,11 +1523,6 @@ watch(
                             currency: "IDR",
                           }).format(availableVenue[venueIndex].attributes.price)
                         }}
-                      </div>
-                      <div class="stats">
-                        <span class="text-[12px] text-gray-400 font-bol"
-                          >Default Catering</span
-                        >
                       </div>
                     </div>
                   </div>

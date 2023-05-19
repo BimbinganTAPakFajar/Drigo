@@ -37,7 +37,7 @@ const config = useRuntimeConfig();
 
 let FAQ = ref();
 
-FAQ.value = await $fetch(`${config.strapiEndpoint}/faqs`, {
+FAQ.value = await $fetch(`${config.public.strapiEndpoint}/faqs`, {
   method: "GET",
 });
 
@@ -47,10 +47,8 @@ let genap = ref([]);
 FAQ.value.data[0].attributes.QuestionAnswer.forEach((element, index) => {
   if (index % 2 == 0) {
     genap.value.push(element);
-    console.log("genap", genap.value);
   } else {
     ganjil.value.push(element);
-    console.log("ganjil", ganjil.value);
   }
 });
 </script>
