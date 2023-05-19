@@ -72,16 +72,16 @@ let isAuth = useCookie(
   //   // maxAge: 60 * 10,
   //   }
 );
-let password = ref("asd@asd.com");
-let identifier = ref("password");
+let password = ref();
+let identifier = ref();
 
 async function submit() {
   const data = await $fetch(`${config.strapiEndpoint}/auth/local`, {
     body: {
-      // identifier: identifier.value,
-      // password: password.value,
-      identifier: "ads@asd.com",
-      password: "password",
+      identifier: identifier.value,
+      password: password.value,
+      // identifier: "ads@asd.com",
+      // password: "password",
     },
     method: "POST",
     headers: {

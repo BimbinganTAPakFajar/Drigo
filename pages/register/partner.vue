@@ -103,10 +103,10 @@
 let username = ref("");
 let password = ref("");
 let email = ref("");
-
+const config = useRuntimeConfig();
 async function register() {
   try {
-    await $fetch("http://localhost:1337/api/auth/local/register", {
+    await $fetch(`${config.public.strapiEndpoint}/auth/local/register`, {
       method: "POST",
       body: {
         username: username.value,
