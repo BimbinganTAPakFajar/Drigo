@@ -39,7 +39,7 @@
           type="email"
           id="email"
           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          placeholder="name@flowbite.com"
+          placeholder="blissful@beginnings.com"
           required
         />
       </div>
@@ -106,13 +106,15 @@ let email = ref("");
 const config = useRuntimeConfig();
 async function register() {
   try {
-    await $fetch(`${config.public.strapiEndpoint}/api/auth/local/register`, {
+    await $fetch(`${config.public.strapiEndpoint}/auth/local/register`, {
       method: "POST",
       body: {
         username: username.value,
         password: password.value,
         email: email.value,
-        role: 2,
+        identifier: {
+          id: 3,
+        },
       },
 
       headers: {

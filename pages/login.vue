@@ -1,7 +1,5 @@
 <template>
   <div class="flex flex-col">
-    <Navbar class="pt-10" />
-
     <section
       class="w-full body-font flex justify-center items-center min-h-screen gap-64"
     >
@@ -58,6 +56,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  layout: "index",
+});
 const config = useRuntimeConfig();
 const token = useCookie(
   "token"

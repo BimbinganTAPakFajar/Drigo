@@ -112,7 +112,9 @@ async function register() {
         username: username.value,
         password: password.value,
         email: email.value,
-        role: 1,
+        identifier: {
+          id: 2,
+        },
       },
 
       headers: {
