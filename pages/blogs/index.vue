@@ -1,9 +1,13 @@
 <script setup>
 definePageMeta({
   layout: "index",
+
+  middleware: ["is-logged"],
 });
 const config = useRuntimeConfig();
-const Blogs = await $fetch(`${config.strapiEndpoint}/blogs?populate*`);
+const Blogs = await $fetch(`${config.public.strapiEndpoint}/blogs?populate=*`);
+
+console.log(Blogs);
 </script>
 
 <template>
@@ -17,7 +21,10 @@ const Blogs = await $fetch(`${config.strapiEndpoint}/blogs?populate*`);
       </h4>
     </div>
 
-    <div class="flex flex-col gap-14 [&>*:last-child_section]:hidden">
+    <div
+      class="flex flex-col gap-14 [&>*:last-child_section]:hidden"
+      v-if="Blogs.data.length > 0"
+    >
       <div class="flex flex-col gap-14" v-for="el in Blogs.data" :key="el.id">
         <CardBlog
           :title="el.attributes.title"
@@ -29,5 +36,6 @@ const Blogs = await $fetch(`${config.strapiEndpoint}/blogs?populate*`);
         <section class="w-full h-[1px] bg-gray-300 rounded-sm"></section>
       </div>
     </div>
+    <div v-else>No Blogs Yet</div>
   </div>
 </template>

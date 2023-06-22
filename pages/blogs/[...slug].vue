@@ -1,6 +1,7 @@
 <script setup>
 definePageMeta({
   layout: "index",
+  middleware: ["is-logged"],
 });
 const route = useRoute();
 const config = useRuntimeConfig();

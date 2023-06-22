@@ -185,7 +185,9 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: "index" });
+import nuxtStorage from "nuxt-storage";
+
+definePageMeta({ layout: "index", middleware: ["partner", "is-logged"] });
 const config = useRuntimeConfig();
 const token = useCookie("token");
 const role = useCookie("role");
@@ -214,7 +216,8 @@ if (token.value) {
     },
   });
 
-  id.value = user.id;
+  // id.value = user.id;
+  nuxtStorage.localStorage.setData("key", user.id);
   if (!role.value) {
     role.value = user.identifier.id;
   }

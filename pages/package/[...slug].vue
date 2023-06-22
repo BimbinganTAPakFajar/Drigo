@@ -7,6 +7,7 @@ import * as V from "v-calendar";
 import "v-calendar/style.css";
 definePageMeta({
   layout: "index",
+  middleware: ["partner", "is-logged", "auth"],
 });
 
 const route = useRoute();
@@ -46,7 +47,7 @@ useHead({
   script: [
     {
       type: "text/javascript",
-      src: "https://app.midtrans.com/snap/snap.js",
+      src: "https://app.sandbox.midtrans.com/snap/snap.js",
       "data-client-key": config.public.midtransClientKey,
     },
   ],
@@ -481,7 +482,7 @@ function submitOrder() {
             },
             body: {
               data: {
-                payStatus: "Payed",
+                payStatus: "pending",
               },
             },
           }).then(navigateTo("/profile"));
@@ -647,7 +648,7 @@ watch(
       <div class="z-0 absolute right-1/4 opacity-50 top-0">
         <img
           v-if="
-            packageDetail.data[0].attributes.category.data.attributes
+            packageDetail.data[0]?.attributes.category?.data.attributes
               .weddingCategory === 'Outdoor'
           "
           src="@/public/assets/test.png"
@@ -1332,20 +1333,10 @@ watch(
                         <div class="stat">
                           <div class="stat-title">Catering Name</div>
 
-                          <div
-                            v-if="
-                              availableCaterings[cateringIndex].attributes.user
-                                .data !== null
-                            "
-                            class="font-bold text-5xl"
-                          >
+                          <div class="font-bold text-5xl">
                             {{
-                              availableCaterings[cateringIndex].attributes.user
-                                .data.attributes.username
+                              availableCaterings[cateringIndex].attributes.name
                             }}
-                          </div>
-                          <div v-else class="font-bold text-5xl">
-                            Our Crew Catering
                           </div>
                         </div>
 

@@ -19,11 +19,11 @@
       <div class="flex flex-col gap-2 w-64">
         <h2 class="text-xl font-semibold">
           {{
-            Crew.data.attributes.photographers.data.length +
-            Crew.data.attributes.venues.data.length +
-            Crew.data.attributes.master_ceremonies.data.length +
-            Crew.data.attributes.make_up_artists.data.length +
-            Crew.data.attributes.caterings.data.length
+            Crew?.data.attributes.photographers.data.length +
+            Crew?.data.attributes.venues.data.length +
+            Crew?.data.attributes.master_ceremonies.data.length +
+            Crew?.data.attributes.make_up_artists.data.length +
+            Crew?.data.attributes.caterings.data.length
           }}
           gifted individuals
         </h2>
@@ -81,17 +81,17 @@
         class="prose prose-xl text-justify tracking-wider leading-loose font-medium"
       >
         <h2 class="text-[#666666] font-semibold text-xl self-start">
-          {{ data.data.attributes.aboutTitle }}
+          {{ data?.data.attributes.aboutTitle }}
         </h2>
 
-        <Markdown :source="data.data.attributes.aboutDesc" />
+        <Markdown :source="data?.data.attributes.aboutDesc" />
       </article>
     </div>
     <!-- Timeline -->
     <div class="flex flex-col gap-10">
       <div
         class="items-start flex w-full flex-col gap-6"
-        v-for="(el, idx) in data.data.attributes.history"
+        v-for="(el, idx) in data?.data.attributes.history"
         :key="idx"
       >
         <h2 class="text-3xl font-semibold text-[#725AE4] tracking-wider">
@@ -137,11 +137,14 @@
         <div class="flex flex-col gap-10 w-full">
           <h1 class="text-2xl font-bold tracking-wider">Photographer</h1>
           <div class="w-full h-[1px] bg-black"></div>
-          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+          <div
+            v-if="Crew?.data.attributes.photographers.data.length > 0"
+            class="flex flex-wrap gap-20 items-center justify-between w-fit"
+          >
             <div
               class="tooltip"
               :data-tip="`Click to see ${el.attributes.name} work`"
-              v-for="el in Crew.data.attributes.photographers.data"
+              v-for="el in Crew?.data.attributes.photographers.data"
               :key="el.id"
             >
               <NuxtLink
@@ -153,16 +156,25 @@
               </NuxtLink>
             </div>
           </div>
+          <div
+            class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+            v-else
+          >
+            There's no photographer that we have right now2.
+          </div>
         </div>
 
         <div class="flex flex-col gap-10 w-full">
           <h1 class="text-2xl font-bold tracking-wider">Make Up Artist</h1>
           <div class="w-full h-[1px] bg-black"></div>
-          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+          <div
+            v-if="Crew?.data?.attributes.make_up_artists.data.length > 0"
+            class="flex flex-wrap gap-20 items-center justify-between w-fit"
+          >
             <div
               class="tooltip"
               :data-tip="`Click to see ${el.attributes.name} work`"
-              v-for="el in Crew.data.attributes.make_up_artists.data"
+              v-for="el in Crew?.data.attributes.make_up_artists.data"
               :key="el.id"
             >
               <NuxtLink
@@ -173,6 +185,12 @@
                 {{ el.attributes.name }}
               </NuxtLink>
             </div>
+          </div>
+          <div
+            class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+            v-else
+          >
+            There's no Make Up Artist that we have right now.
           </div>
         </div>
 
@@ -181,9 +199,12 @@
             Master of Ceremonies
           </h1>
           <div class="w-full h-[1px] bg-black"></div>
-          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+          <div
+            v-if="Crew?.data?.attributes.master_ceremonies.data.length > 0"
+            class="flex flex-wrap gap-20 items-center justify-between w-fit"
+          >
             <div
-              v-for="el in Crew.data.attributes.master_ceremonies.data"
+              v-for="el in Crew?.data.attributes.master_ceremonies.data"
               :key="el.id"
             >
               <h1
@@ -193,13 +214,25 @@
               </h1>
             </div>
           </div>
+          <div
+            class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+            v-else
+          >
+            There's no Master of Ceremonies that we have right now.
+          </div>
         </div>
 
         <div class="flex flex-col gap-10 w-full">
           <h1 class="text-2xl font-bold tracking-wider">Caterings</h1>
           <div class="w-full h-[1px] bg-black"></div>
-          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
-            <div v-for="el in Crew.data.attributes.caterings.data" :key="el.id">
+          <div
+            v-if="Crew?.data?.attributes.caterings.data.length > 0"
+            class="flex flex-wrap gap-20 items-center justify-between w-fit"
+          >
+            <div
+              v-for="el in Crew?.data.attributes.caterings.data"
+              :key="el.id"
+            >
               <h1
                 class="text-xl font-bold cursor-pointer hover:text-gradient-pink/50 ease-in-out duration-300"
               >
@@ -207,16 +240,25 @@
               </h1>
             </div>
           </div>
+          <div
+            class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+            v-else
+          >
+            There's no Caterings that we have right now.
+          </div>
         </div>
 
         <div class="flex flex-col gap-10 w-full">
-          <h1 class="text-2xl font-bold tracking-wider">Photographer</h1>
+          <h1 class="text-2xl font-bold tracking-wider">Venue</h1>
           <div class="w-full h-[1px] bg-black"></div>
-          <div class="flex flex-wrap gap-20 items-center justify-between w-fit">
+          <div
+            v-if="Crew?.data?.attributes.venues.data.length > 0"
+            class="flex flex-wrap gap-20 items-center justify-between w-fit"
+          >
             <div
               class="tooltip"
               :data-tip="`Click to see ${el.attributes.venueName} venue`"
-              v-for="el in Crew.data.attributes.venues.data"
+              v-for="el in Crew?.data.attributes.venues.data"
               :key="el.id"
             >
               <NuxtLink
@@ -228,6 +270,12 @@
               </NuxtLink>
             </div>
           </div>
+          <div
+            class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+            v-else
+          >
+            There's no Venue that we have right now.
+          </div>
         </div>
       </div>
     </div>
@@ -238,11 +286,14 @@
 
 <script setup>
 import { ArrowTrendingDownIcon } from "@heroicons/vue/24/outline";
-
+definePageMeta({
+  layout: "index",
+  middleware: ["is-logged"],
+});
 const config = useRuntimeConfig();
 const openCrew = ref(false);
 import Markdown from "vue3-markdown-it";
-definePageMeta({ layout: "index" });
+definePageMeta({ layout: "partner" });
 
 const { data, error } = useLazyFetch(
   `${config.public.strapiEndpoint}/about-us?populate=*`,
@@ -252,12 +303,12 @@ const { data, error } = useLazyFetch(
 );
 
 const { data: Crew, error: errorCrew } = useLazyFetch(
-  `${config.public.strapiEndpoint}/identifiers/2?populate=*`,
+  `${config.public.strapiEndpoint}/identifiers/1?populate=*`,
   {
     method: "GET",
   }
 );
-
+console.log(Crew.value);
 const { data: Order, error: errorOrder } = useLazyFetch(
   `${config.public.strapiEndpoint}/orders?populate=*`
 );

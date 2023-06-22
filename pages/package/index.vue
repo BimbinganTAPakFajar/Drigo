@@ -1,20 +1,14 @@
 <script setup>
 definePageMeta({
-  layout: "package",
+  layout: "index",
+  middleware: ["partner", "is-logged"],
 });
 const config = useRuntimeConfig();
-let descList = ref([
-  "Outdoor Wedding",
-  "Around 200 People",
-  "Backsound Music",
-  "2 Master Ceremony",
-  "1 Make up Artist",
-  "Indonesian's Tribe Decoration",
-]);
 
 const { data: dataPackage, pending } = await useLazyFetch(
   `${config.public.strapiEndpoint}/packages?populate=*`
 );
+console.log(dataPackage.value);
 </script>
 
 <template>
@@ -47,13 +41,21 @@ const { data: dataPackage, pending } = await useLazyFetch(
       ></div>
     </div>
 
-    <div v-else class="flex gap-10 items-start justify-between">
+    <div v-else class="flex gap-10 items-start justify-center w-full">
       <CardPackage
+        v-if="dataPackage.data.length > 0"
         v-for="el in dataPackage.data"
         :key="el.id"
         :package="el"
         :catering="el.attributes.catering"
       />
+
+      <div
+        class="w-full py-10 flex items-center justify-center bg-gray-100 rounded-xl border-dashed border-[3px] border-gray-300"
+        v-else
+      >
+        No Package Available right now.
+      </div>
     </div>
 
     <FAQ />

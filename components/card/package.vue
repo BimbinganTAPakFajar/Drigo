@@ -2,7 +2,7 @@
   <div>
     <!-- {{ package }} -->
 
-    <div class="shadow-lg py-8 px-10 rounded-lg flex flex-col gap-6">
+    <div class="shadow-lg py-8 px-20 rounded-lg flex flex-col gap-6">
       <div class="flex flex-col gap-4">
         <h1 class="text-3xl font-semibold text-slate-600">
           {{ package.attributes.packageName }}
@@ -40,27 +40,28 @@
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
             Venue with capacity of
-            {{ package.attributes.venue.data.attributes.capacity }} people</span
+            {{ package.attributes.venue.data?.attributes.capacity }}
+            people</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ package.attributes.make_up_artists.data.length }} Expert makeup
+            {{ package.attributes.make_up_artists.data?.length }} Expert makeup
             artistry for brides.</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ package.attributes.master_ceremonies.data.length }} MCs for
+            {{ package.attributes.master_ceremonies.data?.length }} MCs for
             double the wedding magic</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ Object.keys(package.attributes.catering).length }} Tantalizing
+            {{ Object.keys(package.attributes.catering)?.length }} Tantalizing
             wedding catering.</span
           >
         </li>
@@ -69,7 +70,7 @@
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
             {{
-              package.attributes.decoration_vendors.data[0].attributes.themes
+              package.attributes.decoration_vendors.data[0]?.attributes.themes
                 .length
             }}
             Decoration themes for you to choose!

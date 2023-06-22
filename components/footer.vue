@@ -1,4 +1,4 @@
-<template>
+<template v-if="footer">
   <div class="w-full mx-auto w-full bg-white py-10 h-auto flex gap-4">
     <div class="w-[50%] flex flex-col gap-6">
       <div class="flex flex-col gap-4">
@@ -9,7 +9,7 @@
       </div>
 
       <NuxtLink
-        v-for="(el, idx) in footer.data.attributes.blogs.data"
+        v-for="(el, idx) in footer.data.attributes.blogs?.data"
         :key="idx"
         class="flex gap-2 text-slate-500 items-center cursor-pointer"
         :to="`/blogs/${el.attributes.Slug}`"

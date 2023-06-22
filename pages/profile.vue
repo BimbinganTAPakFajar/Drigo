@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({
   layout: "index",
+  middleware: ["partner", "is-logged", "auth"],
 });
 const config = useRuntimeConfig();
 const token = useCookie("token").value;
 
 const { data: userData } = await useFetch(
-  `${config.strapiEndpoint}/users/me?populate=*`,
+  `${config.public.strapiEndpoint}/users/me?populate=*`,
   {
     method: "GET",
     headers: {
