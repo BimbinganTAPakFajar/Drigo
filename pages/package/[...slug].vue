@@ -213,7 +213,7 @@ const totalPrice = computed(() => {
     let venueArray = availableVenue.value.filter((el) => {
       return arrayVenue.value.includes(el.id);
     });
-    let totalCateringPrice = cateringArray[0].attributes.food.reduce(
+    let totalCateringPrice = cateringArray[0]?.attributes?.food.reduce(
       (acc, element) => {
         return acc + element.price * element.stok;
       },
@@ -409,6 +409,7 @@ function submitOrder() {
       },
     }
   ).then((res) => {
+    console.log(res.data);
     const id = res.data.value.data.id;
     console.log(res.data.value.data.attributes);
     useFetch("/api/midtrans", {
@@ -430,7 +431,7 @@ function submitOrder() {
         },
       },
     }).then((res) => {
-      // console.log(res.data.value.data.token);
+      console.log(res);
       window.snap.pay(res.data.value.data.token, {
         onSuccess: function (result) {
           /* You may add your own implementation here */

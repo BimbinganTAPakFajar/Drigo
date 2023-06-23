@@ -293,7 +293,6 @@ definePageMeta({
 const config = useRuntimeConfig();
 const openCrew = ref(false);
 import Markdown from "vue3-markdown-it";
-definePageMeta({ layout: "partner" });
 
 const { data, error } = useLazyFetch(
   `${config.public.strapiEndpoint}/about-us?populate=*`,

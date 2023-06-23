@@ -1,5 +1,4 @@
 import { Buffer } from "buffer";
-const midtransClient = require("midtrans-client");
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
