@@ -18,36 +18,11 @@ const today = ref(new Date());
 const minDate = today.value.setMonth(today.value.getMonth() + 9);
 const maxDate = new Date().setMonth(new Date().getMonth() + 11);
 
-// const url = `https://api.twilio.com/2010-04-01/Accounts/${config.public.accountSID}/Messages.json`;
-
-// const headers = new Headers();
-// headers.set(
-//   "Authorization",
-//   `Basic ${btoa(`${config.public.accountSID}:${config.public.authToken}`)}`
-// );
-// headers.set("Content-Type", "application/x-www-form-urlencoded");
-
-// const formData = new URLSearchParams();
-// formData.set("To", "whatsapp:+6287887151500");
-// formData.set("From", " whatsapp:+85156905652");
-// formData.set("Body", "test");
-
-// const options = {
-//   method: "POST",
-//   headers,
-//   body: formData,
-// };
-
-// await $fetch(url, options)
-//   .then((response) => response.json())
-//   .then((data) => console.log(data))
-//   .catch((error) => console.error(error));
-
 useHead({
   script: [
     {
       type: "text/javascript",
-      src: "https://app.sandbox.midtrans.com/snap/snap.js",
+      src: "https://app.midtrans.com/snap/snap.js",
       "data-client-key": config.public.midtransClientKey,
     },
   ],
