@@ -216,8 +216,8 @@ if (token.value) {
     },
   });
 
-  // id.value = user.id;
-  nuxtStorage.localStorage.setData("key", user.id);
+  id.value = user.id;
+  // nuxtStorage.localStorage.setData("key", user.id);
   if (!role.value) {
     role.value = user.identifier.id;
   }

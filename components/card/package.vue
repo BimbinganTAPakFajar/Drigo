@@ -1,7 +1,5 @@
 <template>
   <div>
-    <!-- {{ package }} -->
-
     <div class="shadow-lg py-8 px-20 rounded-lg flex flex-col gap-6">
       <div class="flex flex-col gap-4">
         <h1 class="text-3xl font-semibold text-slate-600">
@@ -69,12 +67,9 @@
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{
-              package.attributes.decoration_vendors.data[0]?.attributes.themes
-                .length
-            }}
-            Decoration themes for you to choose!
-          </span>
+            {{ package.attributes.decoration_vendors.data[0].attributes.theme }}
+            Decoration themes by default</span
+          >
         </li>
       </ul>
       <span
@@ -136,6 +131,13 @@ const totalPrice = computed(() => {
     },
     0
   );
+  console.log(totalMC);
+  console.log(totalMUA);
+  console.log(totalCaterings);
+  console.log(props.package.attributes.basePrice);
+  console.log(props.package.attributes.photographer.data?.attributes.price);
+  console.log(props.package.attributes.venue.data?.attributes);
+
   return (
     Number(props.package.attributes.basePrice) +
     Number(totalCaterings) +

@@ -435,7 +435,7 @@ function submitOrder() {
     }
   ).then((res) => {
     const id = res.data.value.data.id;
-    // console.log(res.data.value.data.attributes.user);
+    console.log(res.data.value.data.attributes);
     useFetch("/api/midtrans", {
       method: "POST",
       body: {
