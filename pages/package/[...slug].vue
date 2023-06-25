@@ -59,6 +59,7 @@ const formattedEnd = computed(() => {
 // End Date formater for event handling in calendar
 // Available Options
 let availablePhotographers = ref(null);
+let availableBand = ref(null);
 let availableVenue = ref(null);
 let availableCaterings = ref(null);
 let availableMC = ref(null);
@@ -73,12 +74,15 @@ let packageDetail = ref();
 let venue = ref();
 let photographer = ref();
 let catering = ref();
+let band = ref();
 let venueIndex = ref(0);
 let photographerIndex = ref(0);
+let bandIndex = ref(0);
 let cateringIndex = ref(0);
 let MUAIndex = ref(0);
 let arrayMUA = ref([]);
 let arrayPhotographer = ref([]);
+let arrayBand = ref([]);
 let arrayCatering = ref([]);
 let arrayVenue = ref([]);
 let packageID = ref();
@@ -96,6 +100,7 @@ let formSubmitPackage = ref({
   category: 0,
   price: 0,
   master_ceremonies: [],
+  band: 0,
 });
 
 let muaSubmitOrder = ref();
@@ -113,6 +118,10 @@ function getVenueIndex(idx) {
 }
 function getPhotographerIndex(idx) {
   photographerIndex.value = idx;
+}
+
+function getBandIndex(idx) {
+  bandIndex.value = idx;
 }
 
 function getCateringIndex(idx) {
@@ -144,6 +153,7 @@ await $fetch(
   arrayPhotographer.value.push(res.data[0].attributes.photographer.data.id);
   arrayCatering.value.push(res.data[0].attributes.catering.data.id);
   arrayVenue.value.push(res.data[0].attributes.venue.data.id);
+  arrayBand.value.push(res.data[0].attributes.band.data.id);
 
   formSubmitPackage.value.master_ceremonies =
     res.data[0].attributes.master_ceremonies.data.map((el) => el.id);
@@ -151,6 +161,7 @@ await $fetch(
     res.data[0].attributes.photographer.data;
   formSubmitPackage.value.caterings = res.data[0].attributes.catering.data;
   formSubmitPackage.value.venue = res.data[0].attributes.venue.data;
+  formSubmitPackage.value.band = res.data[0].attributes.band.data;
 });
 
 let decorationVendor = ref();
@@ -200,6 +211,9 @@ await $fetch(`${config.public.strapiEndpoint}/caterings?populate=*`, {
   },
 }).then((res) => (catering.value = res.data));
 
+const { data: dataBand } = await useFetch(
+  `${config.public.strapiEndpoint}/bands?populate=*`
+);
 // Get Theme Price
 
 const themePrice = computed(() => {
@@ -218,6 +232,15 @@ const defaultPhotographer = computed(() => {
   return photographers.filter((el) => photographerIds.includes(el.id));
 });
 
+const defaultBand = computed(() => {
+  const bandIDs = dataBand.value.data.map((el) => el.id);
+  const bands = Array.isArray(formSubmitPackage.value.band)
+    ? formSubmitPackage.value.band
+    : [formSubmitPackage.value.band];
+
+  return bands.filter((el) => bandIDs.includes(el.id));
+});
+
 // get default catering of package
 const defaultCatering = computed(() => {
   const cateringIds = catering.value.map((el) => el.id);
@@ -229,77 +252,6 @@ const defaultCatering = computed(() => {
 });
 
 // Total Price
-
-const totalPrice = computed(() => {
-  if (showMUA.value) {
-    let mcArray = packageDetail.value.data[0].attributes.master_ceremonies.data;
-    let muaArray = availableMUA.value.filter((el) => {
-      return arrayMUA.value.includes(el.id);
-    });
-
-    let photoArray = availablePhotographers.value.filter((el) => {
-      return arrayPhotographer.value.includes(el.id);
-    });
-    let cateringArray = availableCaterings.value.filter((el) => {
-      return arrayCatering.value.includes(el.id);
-    });
-    let venueArray = availableVenue.value.filter((el) => {
-      return arrayVenue.value.includes(el.id);
-    });
-    let totalCateringPrice = cateringArray[0]?.attributes?.food.reduce(
-      (acc, element) => {
-        return acc + element.price * element.stok;
-      },
-      0
-    );
-    let totalMcPrice = mcArray.reduce((acc, element) => {
-      return acc + element.attributes.price;
-    }, 0);
-
-    let totalMUA = muaArray.reduce((acc, element) => {
-      return acc + element.attributes.price;
-    }, 0);
-
-    return (
-      Number(basePrice.value) +
-      Number(totalMcPrice) +
-      Number(themePrice.value[0]?.attributes?.price) +
-      Number(photoArray[0].attributes.price) +
-      Number(venueArray[0].attributes.price) +
-      Number(totalCateringPrice) +
-      Number(totalMUA)
-    );
-  } else {
-    let mcArray = packageDetail.value.data[0].attributes.master_ceremonies.data;
-    let photoArray = availablePhotographers.value.filter((el) => {
-      return arrayPhotographer.value.includes(el.id);
-    });
-    let cateringArray = availableCaterings.value.filter((el) => {
-      return arrayCatering.value.includes(el.id);
-    });
-    let venueArray = availableVenue.value.filter((el) => {
-      return arrayVenue.value.includes(el.id);
-    });
-    let totalCateringPrice = cateringArray[0].attributes.food.reduce(
-      (acc, element) => {
-        return acc + element.price * element.stok;
-      },
-      0
-    );
-    let totalMcPrice = mcArray.reduce((acc, element) => {
-      return acc + element.attributes.price;
-    }, 0);
-
-    return Number(
-      Number(basePrice.value) +
-        Number(totalMcPrice) +
-        Number(themePrice.value[0]?.attributes?.price) +
-        Number(photoArray[0].attributes.price) +
-        Number(venueArray[0].attributes.price) +
-        Number(totalCateringPrice)
-    );
-  }
-});
 
 // End Total Price
 
@@ -397,7 +349,124 @@ function availCatering() {
   availableCaterings.value = filteredCatering;
 }
 
+function availBand() {
+  let dateString = today.value.toISOString().split("T")[0].split("-").join("-");
+  const filteredBand = dataBand.value.data.filter((band) => {
+    for (let i = 0; i < band.attributes.orders.data.length; i++) {
+      const order = band.attributes.orders.data[i];
+
+      if (
+        order &&
+        order.attributes.Date &&
+        order.attributes.Date.includes(dateString)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  availableBand.value = filteredBand;
+}
 // End Get Available
+
+// Run at initial
+
+availBand();
+availMUA();
+availPhotographer();
+availCatering();
+availVenue();
+
+watch(
+  () => today.value,
+  () => {
+    availPhotographer();
+    availCatering();
+    availVenue();
+    availMUA();
+  }
+);
+
+const totalPrice = computed(() => {
+  if (showMUA.value) {
+    let mcArray = packageDetail.value.data[0].attributes.master_ceremonies.data;
+    let muaArray = availableMUA.value.filter((el) => {
+      return arrayMUA.value.includes(el.id);
+    });
+    let bandArray = availableBand.value.filter((el) => {
+      return arrayBand.value.includes(el.id);
+    });
+    let photoArray = availablePhotographers.value.filter((el) => {
+      return arrayPhotographer.value.includes(el.id);
+    });
+    let cateringArray = availableCaterings.value.filter((el) => {
+      return arrayCatering.value.includes(el.id);
+    });
+    let venueArray = availableVenue.value.filter((el) => {
+      return arrayVenue.value.includes(el.id);
+    });
+    let totalCateringPrice = cateringArray[0]?.attributes?.food.reduce(
+      (acc, element) => {
+        return acc + element.price * element.stok;
+      },
+      0
+    );
+
+    let totalMcPrice = mcArray.reduce((acc, element) => {
+      return acc + element.attributes.price;
+    }, 0);
+
+    let totalMUA = muaArray.reduce((acc, element) => {
+      return acc + element.attributes.price;
+    }, 0);
+
+    return (
+      Number(basePrice.value) +
+      Number(totalMcPrice) +
+      Number(bandArray[0].attributes.Price) +
+      Number(themePrice.value[0]?.attributes?.price) +
+      Number(photoArray[0].attributes.price) +
+      Number(venueArray[0].attributes.price) +
+      Number(totalCateringPrice) +
+      Number(totalMUA)
+    );
+  } else {
+    let mcArray = packageDetail.value.data[0].attributes.master_ceremonies.data;
+    let photoArray = availablePhotographers.value.filter((el) => {
+      return arrayPhotographer.value.includes(el.id);
+    });
+
+    let bandArray = availableBand.value.filter((el) => {
+      return arrayBand.value.includes(el.id);
+    });
+    let cateringArray = availableCaterings.value.filter((el) => {
+      return arrayCatering.value.includes(el.id);
+    });
+    let venueArray = availableVenue.value.filter((el) => {
+      return arrayVenue.value.includes(el.id);
+    });
+    let totalCateringPrice = cateringArray[0].attributes.food.reduce(
+      (acc, element) => {
+        return acc + element.price * element.stok;
+      },
+      0
+    );
+    let totalMcPrice = mcArray.reduce((acc, element) => {
+      return acc + element.attributes.price;
+    }, 0);
+
+    return Number(
+      Number(basePrice.value) +
+        Number(totalMcPrice) +
+        Number(themePrice.value[0]?.attributes?.Price) +
+        Number(bandArray[0].attributes.price) +
+        Number(photoArray[0].attributes.price) +
+        Number(venueArray[0].attributes.price) +
+        Number(totalCateringPrice)
+    );
+  }
+});
 
 // Submit Order
 function submitOrder() {
@@ -418,17 +487,23 @@ function submitOrder() {
           make_up_artists: {
             connect: arrayMUA.value,
           },
-          photographer: {
-            id: availablePhotographers.value[photographerIndex.value].id,
+          photographers: {
+            id: arrayPhotographer.value[0],
           },
           caterings: {
-            id: availableCaterings.value[cateringIndex.value].id,
+            id: arrayCatering.value[0],
           },
           venue: {
-            id: availableVenue.value[venueIndex.value].id,
+            id: arrayVenue.value[0],
           },
           master_ceremonies: {
             connect: formSubmitPackage.value.master_ceremonies,
+          },
+          bands: {
+            id: arrayBand.value[0],
+          },
+          decoration_vendor: {
+            id: themePrice.value[0].id,
           },
           totalPrice: totalPrice.value,
           startEvent: formattedStart.value,
@@ -531,22 +606,6 @@ function submitOrder() {
 }
 
 // End Submit Order
-
-// Run at initial
-availMUA();
-availPhotographer();
-availCatering();
-availVenue();
-
-watch(
-  () => today.value,
-  () => {
-    availPhotographer();
-    availCatering();
-    availVenue();
-    availMUA();
-  }
-);
 </script>
 
 <template>
@@ -1041,7 +1100,7 @@ watch(
                   Decoration
                 </h1>
                 <div class="flex gap-10">
-                  <span class="text-sm text-slate-400">Not customizeable</span>
+                  <span class="text-sm text-slate-400">Customizeable</span>
                   <ArrowSmallRightIcon
                     class="w-4 stroke-black group-hover:rotate-90 duration-300 ease-in-out"
                   />
@@ -1057,7 +1116,6 @@ watch(
               >
                 <option v-for="(el, idx) in decorationVendor.data" :key="idx">
                   {{ el.attributes.theme }}
-                  <!-- {{ el }} -->
                 </option>
               </select>
 
@@ -1076,7 +1134,148 @@ watch(
               </div>
             </div>
           </div>
-          <!-- Section 3  -->
+
+          <!-- Section Band -->
+
+          <div class="flex items-start gap-6 w-full justify-between">
+            <!-- Photographer -->
+
+            <div class="flex flex-col gap-4 justify-start w-full group">
+              <div class="flex justify-between items-center">
+                <h1 class="font-semibold text-xl flex items-center gap-44">
+                  Band Pengiring
+                </h1>
+                <div class="flex gap-10">
+                  <ArrowSmallRightIcon
+                    class="w-4 stroke-black group-hover:rotate-90 duration-300 ease-in-out"
+                  />
+                </div>
+              </div>
+              <div class="h-[1px] w-full bg-slate-700"></div>
+              <div class="flex flex-row gap-6 w-full">
+                <div class="flex flex-col gap-6 flex-grow w-1/4">
+                  <div class="w-full text-xl font-bold">
+                    Pilih band dari checkbox dibawah
+                  </div>
+
+                  <ul
+                    class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <li
+                      class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600"
+                      v-for="el in availableBand"
+                      :key="el.id"
+                    >
+                      <div class="flex items-center pl-3">
+                        <input
+                          :id="el.id + `band`"
+                          type="radio"
+                          @click="arrayBand[0] = el.id"
+                          :checked="arrayBand.includes(el.id)"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                        />
+                        <label
+                          :for="`#` + el.id + `band`"
+                          class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                          >{{ el.attributes.Name }}
+                          <span
+                            class="text-gray-500 font-light"
+                            v-if="
+                              packageDetail.data[0].attributes.band.data.id ===
+                              el.id
+                            "
+                            >Package Default</span
+                          >
+                        </label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <!-- Separator -->
+                <div class="w-[1px] min-h-full bg-black"></div>
+                <!-- End Separator -->
+                <div class="flex flex-col gap-20 w-3/4">
+                  <div class="flex flex-col gap-6">
+                    <span class="font-bold text-xl"
+                      >Lihat detail dari band melalui list dibawah
+                    </span>
+                    <ul class="flex gap-14 flex-row capitalize">
+                      <li
+                        v-for="(el, idx) in availableBand"
+                        :key="idx"
+                        :class="{
+                          'text-gradient-pink': idx === bandIndex,
+                        }"
+                        class="cursor-pointer duration-300 ease-in-out capitalize"
+                        @click="getBandIndex(idx)"
+                      >
+                        {{ el.attributes.Name }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="flex gap-32 w-full h-80">
+                    <div
+                      class="stats stats-vertical lg:stats-horizontal shadow"
+                    >
+                      <div class="stat">
+                        <div class="stat-value">
+                          {{ availableBand[bandIndex].attributes.Name }}
+                        </div>
+                        <div class="stat-title">Genre Music</div>
+                        <div class="stat-title">
+                          {{ availableBand[bandIndex].attributes.Genre }}
+                        </div>
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-title">
+                          Harga untuk menggunakan jasa band ini :
+                        </div>
+                        <div class="stat-value">
+                          {{
+                            Intl.NumberFormat("id", {
+                              style: "currency",
+                              currency: "IDR",
+                            }).format(availableBand[bandIndex].attributes.Price)
+                          }}
+                        </div>
+
+                        <div class="stat-title">
+                          sudah memberikan jasa sebanyak :
+                          {{
+                            availableBand[bandIndex].attributes.orders.data
+                              .length
+                          }}
+                        </div>
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-title">
+                          Klik tombol dibawah untuk melihat portofolio
+                        </div>
+                        <NuxtLink
+                          class="bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-6 py-3 w-fit h-fit"
+                        >
+                          Lihat portofolio
+                        </NuxtLink>
+                        <div v-for="(element, idx) in defaultBand" :key="idx">
+                          <span
+                            v-if="availableBand[bandIndex].id === element.id"
+                            class="text-gray-400 text-sm"
+                            >Default dari paket</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- End Section Band -->
+
+          <!-- Section Photographer  -->
           <div class="flex items-start gap-6 w-full justify-between">
             <!-- Photographer -->
 

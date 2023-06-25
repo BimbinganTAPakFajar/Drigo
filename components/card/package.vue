@@ -12,6 +12,7 @@
         <ClientOnly>
           <span class="text-sm text-slate-400 flex items-end gap-1">
             <span class="text-3xl font-semibold text-black">
+              <span class="text-xl"> Start from </span>
               {{
                 Intl.NumberFormat("id-ID", {
                   style: "currency",
@@ -67,8 +68,16 @@
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ package.attributes.decoration_vendors.data[0].attributes.theme }}
-            Decoration themes by default</span
+            {{ dekor.data.length }}
+            dekorasi yang bisa anda pilih</span
+          >
+        </li>
+
+        <li class="flex gap-4">
+          <CheckCircleIcon class="w-5 fill-[#3258E8]" />
+          <span>
+            {{ Object.keys(package.attributes.band)?.length }}
+            Band pengiring yang akan memeriahkan pernikahan anda</span
           >
         </li>
       </ul>
@@ -105,6 +114,11 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  dekor: {
+    type: Object,
+    required: true,
+  },
+
   catering: {
     type: Object,
     required: true,
@@ -131,12 +145,6 @@ const totalPrice = computed(() => {
     },
     0
   );
-  console.log(totalMC);
-  console.log(totalMUA);
-  console.log(totalCaterings);
-  console.log(props.package.attributes.basePrice);
-  console.log(props.package.attributes.photographer.data?.attributes.price);
-  console.log(props.package.attributes.venue.data?.attributes);
 
   return (
     Number(props.package.attributes.basePrice) +
@@ -144,7 +152,8 @@ const totalPrice = computed(() => {
     Number(totalMC) +
     Number(totalMUA) +
     Number(props.package.attributes.photographer.data?.attributes.price) +
-    Number(props.package.attributes.venue.data?.attributes.price)
+    Number(props.package.attributes.venue.data?.attributes.price) +
+    Number(props.package.attributes.band.data.attributes.Price)
   );
 });
 const emit = defineEmits(["redirect"]);

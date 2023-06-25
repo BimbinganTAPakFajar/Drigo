@@ -8,6 +8,11 @@ const config = useRuntimeConfig();
 const { data: dataPackage, pending } = await useLazyFetch(
   `${config.public.strapiEndpoint}/packages?populate=*`
 );
+
+const { data: dataDekor, pending: pendingDekor } = await useLazyFetch(
+  `${config.public.strapiEndpoint}/decoration-vendors?populate=*`
+);
+
 console.log(dataPackage.value);
 </script>
 
@@ -47,6 +52,7 @@ console.log(dataPackage.value);
         v-for="el in dataPackage.data"
         :key="el.id"
         :package="el"
+        :dekor="dataDekor"
         :catering="el.attributes.catering"
       />
 
