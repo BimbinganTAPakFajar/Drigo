@@ -104,27 +104,56 @@
     <!-- End Choose Package -->
 
     <!-- Schedule Calender -->
-    <div class="flex flex-col gap-36 w-full">
-      <div class="flex flex-col gap-3 text-center">
-        <h2 class="text-black font-bold text-3xl">Our Schedule</h2>
-        <p class="text-[#7B7B7B] font-medium text-base">
-          Get to know our schedule for you to prepare
-        </p>
-      </div>
+    <ClientOnly>
+      <div class="flex flex-col gap-36 w-full">
+        <div class="flex flex-col gap-3 text-center">
+          <h2 class="text-black font-bold text-3xl">Our Schedule</h2>
+          <p class="text-[#7B7B7B] font-medium text-base">
+            Get to know our schedule for you to prepare
+          </p>
+        </div>
 
-      <div class="flex flex-col gap-24 mx-auto">
-        <Calendar
-          class="border-b-2 last-of-type:border-b-0 pb-14"
-          v-for="(el, idx) in calendarList"
-          :key="idx"
-          :image="el.image"
-          :customerName="el.customerName"
-          :date="new Date()"
-          :packageName="el.packageName"
+        <vue-cal
+          style="height: 600px; color: #6b7280"
+          :selected-date="dataCal.data[0].attributes.Date"
+          :events="events"
+          class="vuecal--blue-theme vuecal__event-time"
+          active-view="week"
+          :disable-views="['years', 'year', 'month']"
         />
       </div>
-      <div class="flex items-center justify-center">
-        <Button :type="3" buttonText="View more" />
+    </ClientOnly>
+
+    <div class="flex w-full items-center justify-center flex-col gap-10">
+      <h1
+        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+      >
+        Keberkahan dalam Setiap Jepretan:
+        <span
+          class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"
+          >Galeri Pesona</span
+        >
+      </h1>
+
+      <div class="carousel w-full aspect-[21/9]">
+        <div
+          v-for="(el, idx) in data.Gallery.data"
+          :id="idx + 1"
+          class="carousel-item w-full aspect-video"
+          :key="el.id"
+        >
+          <img :src="el.attributes.url" class="bg-fit mx-auto" />
+          {{ el.id }}
+        </div>
+      </div>
+      <div class="flex justify-center w-full py-2 gap-2">
+        <a
+          v-for="(el, idx) in data.Gallery.data"
+          :key="el.id"
+          :href="`#` + (Number(idx) + Number(1))"
+          class="btn btn-xs"
+          >{{ idx + 1 }}</a
+        >
       </div>
     </div>
     <!-- End Schedule Calender -->
@@ -185,7 +214,8 @@
 </template>
 
 <script setup>
-import nuxtStorage from "nuxt-storage";
+import VueCal from "vue-cal";
+import "vue-cal/dist/vuecal.css";
 
 definePageMeta({ layout: "index", middleware: ["partner", "is-logged"] });
 const config = useRuntimeConfig();
@@ -196,7 +226,26 @@ let data = ref({});
 let image = ref({});
 let errCode = ref();
 
-await $fetch(`${config.strapiEndpoint}/landing-page?populate=*`, {
+const { data: dataCal } = useFetch(
+  `${config.public.strapiEndpoint}/orders?populate=*&sort[0]=Date:asc`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+console.log(dataCal.value);
+const events = computed(() => {
+  return dataCal.value.data.map((item) => {
+    return {
+      start: item.attributes.startEvent, // assuming these keys exist in the `attributes` object
+      end: item.attributes.endEvent,
+      title: item.attributes.user?.data?.attributes.username + " wedding",
+    };
+  });
+});
+await $fetch(`${config.public.strapiEndpoint}/landing-page?populate=*`, {
   method: "get",
 })
   .then((res) => {
@@ -208,43 +257,22 @@ await $fetch(`${config.strapiEndpoint}/landing-page?populate=*`, {
   .catch((err) => (errCode = 1));
 
 if (token.value) {
-  const user = await $fetch(`${config.strapiEndpoint}/users/me?populate=*`, {
-    method: "GET",
-    headers: {
-      "content-type": "application/json",
-      Authorization: "Bearer " + token.value,
-    },
-  });
+  const user = await $fetch(
+    `${config.public.strapiEndpoint}/users/me?populate=*`,
+    {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + token.value,
+      },
+    }
+  );
 
   id.value = user.id;
-  // nuxtStorage.localStorage.setData("key", user.id);
   if (!role.value) {
     role.value = user.identifier.id;
   }
 }
-
-const calendarList = [
-  {
-    image: "/assets/albert.jpg",
-    customerName: "Albert Dera",
-    packageName: "Outdoor Package",
-  },
-  {
-    image: "/assets/albert.jpg",
-    customerName: "Albert Dera",
-    packageName: "Outdoor Package",
-  },
-  {
-    image: "/assets/albert.jpg",
-    customerName: "Albert Dera",
-    packageName: "Outdoor Package",
-  },
-  {
-    image: "/assets/albert.jpg",
-    customerName: "Albert Dera",
-    packageName: "Outdoor Package",
-  },
-];
 
 const cardPackage = [
   {
@@ -267,5 +295,9 @@ const cardPackage = [
 <style scoped>
 .titleCard {
   font-size: calc(32px + ((100vw - 320px) / 680) * 1.5);
+}
+
+.vuecal--blue-theme .vuecal__menu {
+  background-color: #3258e8 !important;
 }
 </style>

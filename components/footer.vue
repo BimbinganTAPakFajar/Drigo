@@ -65,7 +65,10 @@ import { StopIcon } from "@heroicons/vue/24/outline";
 
 let footer = ref();
 const config = useRuntimeConfig();
-footer.value = await $fetch(`${config.strapiEndpoint}/footer?populate=*`, {
-  method: "GET",
-});
+footer.value = await $fetch(
+  `${config.public.strapiEndpoint}/footer?populate=*`,
+  {
+    method: "GET",
+  }
+);
 </script>

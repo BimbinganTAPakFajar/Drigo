@@ -62,21 +62,21 @@ const emit = defineEmits({
 });
 function remove(id) {
   if (props.type === 1) {
-    $fetch(`${config.strapiEndpoint}/photographers/${id}`, {
+    $fetch(`${config.public.strapiEndpoint}/photographers/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + props.token,
       },
     });
   } else if (props.type === 2) {
-    $fetch(`${config.strapiEndpoint}/venues/${id}`, {
+    $fetch(`${config.public.strapiEndpoint}/venues/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + props.token,
       },
     });
   } else {
-    $fetch(`${config.strapiEndpoint}/caterings/${id}`, {
+    $fetch(`${config.public.strapiEndpoint}/caterings/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + props.token,

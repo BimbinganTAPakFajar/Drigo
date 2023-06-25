@@ -27,6 +27,36 @@ useHead({
     },
   ],
 });
+
+// Date formater for event handling in calendar
+
+function formatedDate(date, hoursToAdd = 0) {
+  let eventDate = new Date(today.value);
+  eventDate.setHours(eventDate.getHours() + hoursToAdd);
+
+  let year = eventDate.getFullYear();
+  let month = eventDate.getMonth() + 1; // getMonth() is zero-based
+  let day = eventDate.getDate();
+  let hours = eventDate.getHours();
+  let minutes = eventDate.getMinutes();
+
+  // Pad single digit month, day, hours and minutes with a leading zero
+  month = month < 10 ? "0" + month : month;
+  day = day < 10 ? "0" + day : day;
+  hours = hours < 10 ? "0" + hours : hours;
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+const formattedStart = computed(() => {
+  return formatedDate(today.value);
+});
+
+const formattedEnd = computed(() => {
+  return formatedDate(today.value, 6);
+});
+// End Date formater for event handling in calendar
 // Available Options
 let availablePhotographers = ref(null);
 let availableVenue = ref(null);
@@ -131,8 +161,11 @@ await $fetch(`${config.public.strapiEndpoint}/decoration-vendors`, {
   },
 }).then((res) => {
   console.log(res);
+
   (decorationVendor.value = res),
     (themeArray.value = res.data.map((el) => el.attributes.theme));
+
+  themeName.value = res.data[0].attributes.theme;
   console.log(themeArray.value);
 });
 
@@ -228,20 +261,16 @@ const totalPrice = computed(() => {
     }, 0);
 
     return (
-      basePrice.value +
-      totalMcPrice +
-      totalMUA +
-      // Number(themePrice[0]?.attributes?.price)  +
+      Number(basePrice.value) +
+      Number(totalMcPrice) +
+      Number(themePrice.value[0]?.attributes?.price) +
       Number(photoArray[0].attributes.price) +
       Number(venueArray[0].attributes.price) +
-      totalCateringPrice
+      Number(totalCateringPrice) +
+      Number(totalMUA)
     );
   } else {
     let mcArray = packageDetail.value.data[0].attributes.master_ceremonies.data;
-    let muaArray = availableMUA.value.filter((el) => {
-      return arrayMUA.value.includes(el.id);
-    });
-
     let photoArray = availablePhotographers.value.filter((el) => {
       return arrayPhotographer.value.includes(el.id);
     });
@@ -262,12 +291,12 @@ const totalPrice = computed(() => {
     }, 0);
 
     return Number(
-      basePrice.value +
-        totalMcPrice +
-        // themePrice[0]?.attributes?.price +
+      Number(basePrice.value) +
+        Number(totalMcPrice) +
+        Number(themePrice.value[0]?.attributes?.price) +
         Number(photoArray[0].attributes.price) +
         Number(venueArray[0].attributes.price) +
-        totalCateringPrice
+        Number(totalCateringPrice)
     );
   }
 });
@@ -375,10 +404,11 @@ function submitOrder() {
   loading.value = true;
   const { data: submitResponseData, pending: pendingSubmitData } = useLazyFetch(
     `${config.public.strapiEndpoint}/orders?populate=*`,
+
     {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: "Bearer " + token.value,
       },
       body: {
         data: {
@@ -401,6 +431,8 @@ function submitOrder() {
             connect: formSubmitPackage.value.master_ceremonies,
           },
           totalPrice: totalPrice.value,
+          startEvent: formattedStart.value,
+          endEvent: formattedEnd.value,
           Date: today.value.toISOString().split("T")[0].split("-").join("-"),
           user: {
             id: id.value,
@@ -439,7 +471,7 @@ function submitOrder() {
           useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
             method: "PUT",
             headers: {
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + token.value,
             },
             body: {
               data: {
@@ -454,7 +486,7 @@ function submitOrder() {
           useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
             method: "PUT",
             headers: {
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + token.value,
             },
             body: {
               data: {
@@ -467,7 +499,7 @@ function submitOrder() {
           useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
             method: "PUT",
             headers: {
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + token.value,
             },
             body: {
               data: {
@@ -482,7 +514,7 @@ function submitOrder() {
           useFetch(`${config.public.strapiEndpoint}/orders/${id}?populate=*`, {
             method: "DELETE",
             headers: {
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + token.value,
             },
           }).then((loading.value = false));
           alert("you closed the popup without finishing the payment");
@@ -490,7 +522,6 @@ function submitOrder() {
         },
       });
     });
-    // .then(window.location.reload());
   });
 
   return {
@@ -699,6 +730,7 @@ watch(
           "
         >
           <!-- Section 1 -->
+
           <div
             class="flex flex-col lg:flex-row items-start gap-32 lg:gap-6 w-full justify-between"
           >
@@ -1023,12 +1055,7 @@ watch(
                 v-model="themeName"
                 class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
               >
-                <option
-                  v-for="(el, idx) in decorationVendor.data"
-                  :key="idx"
-                  :selected="idx == 0"
-                  :value="el.attributes.theme"
-                >
+                <option v-for="(el, idx) in decorationVendor.data" :key="idx">
                   {{ el.attributes.theme }}
                   <!-- {{ el }} -->
                 </option>

@@ -6,7 +6,7 @@ definePageMeta({
 const route = useRoute();
 const config = useRuntimeConfig();
 const { data, pending } = await useFetch(
-  `${config.strapiEndpoint}/blogs?filters[Slug]=${route.params.slug}&populate=*`
+  `${config.public.strapiEndpoint}/blogs?filters[Slug]=${route.params.slug}&populate=*`
 );
 
 useSeoMeta({
