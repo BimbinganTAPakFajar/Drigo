@@ -104,24 +104,25 @@
     <!-- End Choose Package -->
 
     <!-- Schedule Calender -->
+    <ClientOnly>
+      <div class="flex flex-col gap-36 w-full">
+        <div class="flex flex-col gap-3 text-center">
+          <h2 class="text-black font-bold text-3xl">Our Schedule</h2>
+          <p class="text-[#7B7B7B] font-medium text-base">
+            Get to know our schedule for you to prepare
+          </p>
+        </div>
 
-    <div class="flex flex-col gap-36 w-full">
-      <div class="flex flex-col gap-3 text-center">
-        <h2 class="text-black font-bold text-3xl">Our Schedule</h2>
-        <p class="text-[#7B7B7B] font-medium text-base">
-          Get to know our schedule for you to prepare
-        </p>
+        <vue-cal
+          style="height: 600px; color: #6b7280"
+          :selected-date="dataCal.data[0].attributes.Date"
+          :events="events"
+          class="vuecal--blue-theme vuecal__event-time"
+          active-view="week"
+          :disable-views="['years', 'year', 'month']"
+        />
       </div>
-
-      <vue-cal
-        style="height: 600px; color: #6b7280"
-        :selected-date="dataCal.data[0].attributes.Date"
-        :events="events"
-        class="vuecal--blue-theme vuecal__event-time"
-        active-view="week"
-        :disable-views="['years', 'year', 'month']"
-      />
-    </div>
+    </ClientOnly>
 
     <div class="flex w-full items-center justify-center flex-col gap-10">
       <h1
@@ -229,9 +230,6 @@ const { data: dataCal } = useFetch(
   `${config.public.strapiEndpoint}/orders?populate=*&sort[0]=Date:asc`,
   {
     method: "GET",
-    headers: {
-      Authorization: "Bearer " + token.value,
-    },
   }
 );
 console.log(dataCal.value);
