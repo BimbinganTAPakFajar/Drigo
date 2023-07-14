@@ -3,10 +3,41 @@
     <section
       class="w-full body-font flex justify-center items-center min-h-screen gap-64"
     >
-      <h1 class="text-5xl font-bold">
-        Welcome, <br />
-        <span class="motion-safe:animate-pulse">We're</span> Waiting for you!
-      </h1>
+      <div class="flex flex-col gap-10 cursor-pointer">
+        <div @click="back" class="flex gap-6 group">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+
+          <p class="group-hover:-ml-2 duration-300 ease-in-out">Back</p>
+        </div>
+        <h1
+          class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+        >
+          Selamat datang
+          <span
+            class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"
+            >Kami menunggumu</span
+          >
+        </h1>
+        <p
+          class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400"
+        >
+          Log in dan mulailah petualangan menarik merancang pernikahan impianmu!
+          Ubah setiap detail sesuai selera, buat momenmu menjadi lebih berkesan!
+        </p>
+      </div>
 
       <div
         class="p-8 bg-gray-200 rounded-xl flex flex-col gap-10 hover:drop-shadow-sm duration-300 ease-in-out"
@@ -68,10 +99,10 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers, minLength } from "@vuelidate/validators";
 
 definePageMeta({
-  layout: "index",
+  layout: "no-footer",
   middleware: "is-logged",
 });
-
+const router = useRouter();
 const config = useRuntimeConfig();
 const token = useCookie(
   "token"
@@ -79,13 +110,15 @@ const token = useCookie(
   //   // maxAge: 60 * 10,
   //   }
 );
-const isAdmin = useCookie("isAdmin");
+
 let isAuth = useCookie(
   "isAuth"
   //  {
   //   // maxAge: 60 * 10,
   //   }
 );
+const role = useCookie("role");
+const id = useCookie("id");
 
 const formData = reactive({
   email: "",
@@ -105,7 +138,9 @@ const rules = computed(() => {
 });
 
 const v$ = useVuelidate(rules, formData);
-
+function back() {
+  router.back();
+}
 async function submit() {
   await $fetch(`${config.public.strapiEndpoint}/auth/local`, {
     body: {
@@ -117,19 +152,26 @@ async function submit() {
       "content-type": "application/json",
     },
   }).then((res) => {
-    (token.value = res.jwt),
-      (isAuth.value = true),
-      console.log(
-        Buffer.from(res.user.isAdmin.toString(), "utf8").toString("base64")
-      );
-    isAdmin.value = Buffer.from(res.user.isAdmin.toString(), "utf8").toString(
-      "base64"
-    );
-    if (res.user.isAdmin) {
-      navigateTo("/admin");
-    } else {
-      navigateTo("/"), onBeforeRouteUpdate(() => location.reload());
-    }
+    token.value = res.jwt;
+    isAuth.value = true;
+    let isAdmin = res.user.isAdmin;
+    id.value = res.user.id;
+
+    $fetch(`${config.public.strapiEndpoint}/users/me?populate=*`, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + token.value,
+      },
+    }).then((res) => {
+      console.log(res);
+      role.value = res.identifier.id;
+      if (isAdmin) {
+        navigateTo("/admin");
+      } else {
+        navigateTo("/");
+      }
+    });
   });
 }
 </script>

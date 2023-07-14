@@ -1558,7 +1558,9 @@
   </div>
 </template>
 <script setup>
-definePageMeta({});
+definePageMeta({
+  middleware: ["admin"],
+});
 import { initFlowbite } from "flowbite";
 
 onMounted(() => {

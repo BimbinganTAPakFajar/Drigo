@@ -41,14 +41,40 @@
       </div>
       <div class="grid grid-cols-2 gap-20">
         <div
-          class="col-span-1 flex items-start justify-center gap-10"
+          class="col-span-1 flex items-center justify-center gap-10"
           v-for="(el, idx) in data.organizerStrength"
           :key="idx"
         >
-          <div class="bg-white aspect-square rounded-xl p-6">
-            <img :src="el.iconLink" alt="icon" />
+          <div class="bg-white aspect-square rounded-xl p-6" v-if="idx === 0">
+            <img
+              src="https://ik.imagekit.io/drigoalexander/list-check_NftA8X5f7.png?updatedAt=1688413220645"
+              alt="icon"
+              class="w-14"
+            />
           </div>
 
+          <div class="bg-white aspect-square rounded-xl p-6" v-if="idx === 1">
+            <img
+              src="https://ik.imagekit.io/drigoalexander/trophy_C5p8zAQek.png?updatedAt=1688413220868"
+              alt="icon"
+              class="w-32"
+            />
+          </div>
+
+          <div class="bg-white aspect-square rounded-xl p-6" v-if="idx === 2">
+            <img
+              src="https://ik.imagekit.io/drigoalexander/mind-share_fSV5DZ8Lm.png?updatedAt=1688413220858"
+              alt="icon"
+              class="w-32"
+            />
+          </div>
+          <div class="bg-white aspect-square rounded-xl p-6" v-if="idx === 3">
+            <img
+              src="https://ik.imagekit.io/drigoalexander/users-alt_KIcghXZsE.png?updatedAt=1688413220634"
+              alt="icon"
+              class="w-32"
+            />
+          </div>
           <div
             class="flex flex-col gap-2 justify-start items-start text-black tracking-wider pr-10"
           >
@@ -65,14 +91,7 @@
     </div>
     <!-- Choose Package -->
     <div class="flex items-center justify-evenly gap-20">
-      <div class="flex gap-10">
-        <!-- <CardPackage
-          v-for="(el, idx) in cardPackage"
-          :key="idx"
-          :package="el.package"
-          :price="el.price"
-        /> -->
-      </div>
+      <div class="flex gap-10"></div>
 
       <div class="flex flex-col gap-6 items-start">
         <h4 class="text-base text-[#3258E8] font-semibold">Our Package</h4>
@@ -87,8 +106,48 @@
             :key="idx"
             class="flex flex-col gap-4 w-44"
           >
-            <h1 class="text-black font-semibold text-2xl">
-              {{ el.stats }}
+            <h1
+              v-if="idx === 0 && dataPackage"
+              class="text-black font-semibold text-2xl"
+            >
+              {{ dataPackage.data.length }} Variants
+            </h1>
+            <h1
+              v-else-if="idx === 0 && !dataPackage"
+              class="text-black font-semibold text-2xl"
+            >
+              None Variants
+            </h1>
+            <h1
+              v-else-if="idx === 1 && dataOrder"
+              class="text-black font-semibold text-2xl"
+            >
+              {{ dataOrder.data.length }} Valued
+            </h1>
+            <h1
+              v-else-if="idx === 1 && dataOrder.length"
+              class="text-black font-semibold text-2xl"
+            >
+              None People
+            </h1>
+            <h1
+              v-else-if="idx === 2 && dataCrew"
+              class="text-black font-semibold text-2xl"
+            >
+              {{
+                dataCrew?.data.attributes.photographers.data.length +
+                dataCrew?.data.attributes.venues.data.length +
+                dataCrew?.data.attributes.master_ceremonies.data.length +
+                dataCrew?.data.attributes.make_up_artists.data.length +
+                dataCrew?.data.attributes.caterings.data.length
+              }}
+              Person
+            </h1>
+            <h1
+              v-else-if="idx === 2 && !dataCrew"
+              class="text-black font-semibold text-2xl"
+            >
+              None Person
             </h1>
             <p class="text-[#7B7B7B] font-regular text-base">
               {{ el.description }}
@@ -96,8 +155,12 @@
           </div>
         </div>
         <div class="flex gap-6 items-start">
-          <Button :type="1" buttonText="Choose Package" />
-          <Button :type="2" buttonText="View More" />
+          <NuxtLink
+            to="/package"
+            class="bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-6 py-3 w-auto"
+          >
+            Choose Package
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -105,7 +168,7 @@
 
     <!-- Schedule Calender -->
     <ClientOnly>
-      <div class="flex flex-col gap-36 w-full">
+      <div class="flex flex-col gap-36 w-full" v-if="dataCal.data[0]">
         <div class="flex flex-col gap-3 text-center">
           <h2 class="text-black font-bold text-3xl">Our Schedule</h2>
           <p class="text-[#7B7B7B] font-medium text-base">
@@ -121,6 +184,25 @@
           active-view="week"
           :disable-views="['years', 'year', 'month']"
         />
+      </div>
+
+      <div v-else>
+        <div class="alert animate-bounce my-10 bg-neutral-700">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="stroke-info shrink-0 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span class="text-xl">We held no event right now!</span>
+        </div>
       </div>
     </ClientOnly>
 
@@ -157,59 +239,6 @@
       </div>
     </div>
     <!-- End Schedule Calender -->
-
-    <!-- Advertisement -->
-    <!-- <div
-      class="w-full rounded-tl-[5rem] rounded-xl flex items-center justify-center relative bg-[#3258E8]/10"
-    >
-      <div
-        class="absolute z-10 -top-8 -right-8 w-20 flex items-center justify-center aspect-square bg-white rounded-full shadow-2xl"
-      >
-        <img src="/assets/love.svg" alt="Love Icon" />
-      </div>
-
-      <div
-        class="flex flex-col gap-4 absolute z-10 left-8 -bottom-8 bg-white rounded-xl py-4 pl-4 pr-6 shadow-xl"
-      >
-        <p class="text-sm font-semibold text-black">
-          Thank you for helping <br />
-          my Wedding. Amazing!
-        </p>
-        <div class="flex gap-2 items-center">
-          <div class="w-8 aspect-square overflow-hidden rounded-full">
-            <img src="/assets/albert.jpg" alt="Profile Picture" />
-          </div>
-          <div class="flex flex-col gap-[1px]">
-            <h2 class="text-sm font-semibold text-black">Drigo Alexander</h2>
-            <p class="text-xs font-light text-black">Happy Customer</p>
-          </div>
-        </div>
-      </div>
-      <div
-        class="flex flex-col gap-6 items-center justify-center text-center w-full py-20 overflow-hidden relative"
-      >
-        <img
-          class="w-full absolute top-0 left-0 z-0"
-          src="/assets/world.svg"
-          alt="Background"
-        />
-        <h4 class="z-10 relative text-base font-semibold text-[#3258E8]">
-          Believe your wedding to us
-        </h4>
-        <h2 class="z-10 relative text-4xl font-semibold text-black">
-          Dont Miss The 50% Discount <br />
-          If You Book Your First Appointment
-        </h2>
-        <p
-          class="z-10 relative text-base font-normal text-black whitespace-pre-line"
-        >
-          Let's maximize your wedding and <br />
-          make the memories that never forgotten
-        </p>
-        <Button :type="1" class="z-10 relative" buttonText="Book now" />
-      </div>
-    </div> -->
-    <!-- End Advertisement -->
   </div>
 </template>
 
@@ -219,9 +248,6 @@ import "vue-cal/dist/vuecal.css";
 
 definePageMeta({ layout: "index", middleware: ["partner", "is-logged"] });
 const config = useRuntimeConfig();
-const token = useCookie("token");
-const role = useCookie("role");
-const id = useCookie("id");
 let data = ref({});
 let image = ref({});
 let errCode = ref();
@@ -232,7 +258,19 @@ const { data: dataCal } = useFetch(
     method: "GET",
   }
 );
-console.log(dataCal.value);
+
+const { data: dataPackage, error: errorPackage } = await useFetch(
+  `${config.public.strapiEndpoint}/packages?populate=*`
+);
+const { data: dataCrew, error: errorCrew } = await useFetch(
+  `${config.public.strapiEndpoint}/identifiers/1?populate=*`
+);
+const { data: dataOrder, error: errorOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/orders?populate=*`
+);
+console.log(dataPackage.value);
+console.log(dataOrder.value);
+console.log(dataCrew.value);
 const events = computed(() => {
   return dataCal.value.data.map((item) => {
     return {
@@ -252,41 +290,6 @@ await $fetch(`${config.public.strapiEndpoint}/landing-page?populate=*`, {
     console.log(errCode);
   })
   .catch((err) => (errCode = 1));
-
-if (token.value) {
-  const user = await $fetch(
-    `${config.public.strapiEndpoint}/users/me?populate=*`,
-    {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        Authorization: "Bearer " + token.value,
-      },
-    }
-  );
-
-  id.value = user.id;
-  if (!role.value) {
-    role.value = user.identifier.id;
-  }
-}
-
-const cardPackage = [
-  {
-    package: "Outdoor Package",
-    price: "50 Million",
-    buffet: "20 Menus",
-    crew: "15 Person",
-    capacityVenue: "135K+",
-  },
-  {
-    package: "Vintage Package",
-    price: "20 Million",
-    buffet: "10 Menus",
-    crew: "7 Person",
-    capacityVenue: "60K+",
-  },
-];
 </script>
 
 <style scoped>

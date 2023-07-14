@@ -5,7 +5,7 @@
     <div
       class="w-full flex gap-6 items-center justify-between group cursor-pointer"
     >
-      <NuxtLink to="/login" class="flex gap-6 group">
+      <div @click="back" class="flex gap-6 group cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -22,7 +22,7 @@
         </svg>
 
         <p class="group-hover:-ml-2 duration-300 ease-in-out">Back</p>
-      </NuxtLink>
+      </div>
 
       <h1 class="text-2xl text-right uppercase font-semibold">
         We are <br />
@@ -104,6 +104,11 @@ let username = ref("");
 let password = ref("");
 let email = ref("");
 const config = useRuntimeConfig();
+const router = useRouter();
+function back() {
+  router.back();
+}
+
 async function register() {
   try {
     await $fetch(`${config.public.strapiEndpoint}/auth/local/register`, {
@@ -128,5 +133,3 @@ async function register() {
   }
 }
 </script>
-
-<style></style>

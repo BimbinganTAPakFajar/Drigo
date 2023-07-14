@@ -1,5 +1,5 @@
 <template>
-  <div class="w-[90%] bg-white flex flex-col mx-auto">
+  <div class="w-[90%] bg-white flex flex-col mx-auto max-w-screen-2xl">
     <div
       v-if="open"
       class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"

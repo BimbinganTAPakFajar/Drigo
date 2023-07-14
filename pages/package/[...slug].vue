@@ -503,7 +503,7 @@ function submitOrder() {
             id: arrayBand.value[0],
           },
           decoration_vendor: {
-            id: themePrice.value[0].id,
+            id: themePrice.value[0].id,co
           },
           totalPrice: totalPrice.value,
           startEvent: formattedStart.value,

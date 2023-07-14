@@ -249,4 +249,4 @@ function remove(id) {
   </div>
 </template>
 
-<style></style>
+

@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "@nuxtjs/fontaine",
+    
     // "@nuxtjs/html-validator",
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
