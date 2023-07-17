@@ -3,8 +3,8 @@
     <section
       class="w-full body-font flex justify-center items-center min-h-screen gap-64"
     >
-      <div class="flex flex-col gap-10 cursor-pointer">
-        <div @click="back" class="flex gap-6 group">
+      <div class="flex flex-col gap-10">
+        <div @click="back" class="flex gap-6 group cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

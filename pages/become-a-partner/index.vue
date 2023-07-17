@@ -134,7 +134,7 @@ async function submitFood() {
         user: {
           id: number,
         },
-        identifier: 1,
+        identifier: 2,
       },
     },
   }).then(() => {

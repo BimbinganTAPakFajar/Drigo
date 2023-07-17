@@ -283,31 +283,111 @@
       <div
         class="flex items-center justify-center h-auto py-7 mb-4 rounded bg-gray-50 dark:bg-gray-800"
       >
-        <div
-          class="flex flex-col items-center justify-center w-2/3 max-w-fit text-center gap-6"
-        >
-          <h1
-            class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
-          >
-            Pendaftaran
-            <span
-              class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"
-              >Crew Catering</span
+        <div class="flex flex-wrap items-center gap-6">
+          <div class="flex flex-col gap-3 w-[31%]">
+            <label for="cateringName">Catering Name</label>
+            <input
+              type="text"
+              id="cateringName"
+              v-model="formCatering.name"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Dapur Betawi"
+              required
+            />
+          </div>
+          <div class="flex flex-col gap-3 w-[50%] flex-grow">
+            <label for="address">Catering address</label>
+            <input
+              type="text"
+              id="address"
+              min="0"
+              v-model="formCatering.location"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Jln. Bandung"
+              required
+            />
+          </div>
+          <div class="flex flex-col gap-3 flex-grow w-[31%]">
+            <label for="Food">Catering Food</label>
+            <input
+              type="text"
+              id="Food"
+              min="0"
+              v-model="foodObjTemp.food"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Bakso"
+              required
+            />
+          </div>
+          <div class="flex flex-col gap-3 flex-grow w-[31%]">
+            <label for="Food Price">Food Price </label>
+            <input
+              type="number"
+              id="Food Price"
+              v-model="foodObjTemp.price"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Price / food"
+              required
+            />
+          </div>
+          <div class="flex flex-col gap-3 flex-grow w-[31%]">
+            <label for="Food Price">Food Stok </label>
+            <input
+              type="number"
+              id="Food Price"
+              v-model="foodObjTemp.stok"
+              class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Food Stock"
+              required
+            />
+          </div>
+          <div class="flex w-full justify-between items-start">
+            <button
+              class="px-6 py-3 duration-300 ease-in-out text-[#7B7B7B] focus:text-black hover:ring-2 ring-[#3258E8] rounded-xl w-auto"
+              @click.prevent="addFoodList"
             >
-          </h1>
-          <p
-            class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400"
-          >
-            Pastikan anda menggunakan email admin blissful ketika mendaftarkan
-            crew fotografer pada google form
-          </p>
+              Tambah
+            </button>
+            <ol
+              class="justify-end flex flex-col gap-8 list-decimal divide-y-[1px] divide-black [&>*:not(:first-child)]:pt-8"
+            >
+              <li
+                v-for="(el, idx) in store.foodList"
+                :key="idx"
+                class="flex gap-20 items-center justify-center list-decimal"
+              >
+                <div class="flex gap-2 flex-col">
+                  <h1 class="font-semibold">Food Name</h1>
+                  <span>{{ el.food }}</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <h1 class="font-semibold">Food Price</h1>
+                  <h1 class="font-semibold">{{ el.price }}</h1>
+                </div>
 
-          <NuxtLink
-            to=""
-            class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                <div class="flex flex-col gap-2">
+                  <h1 class="font-semibold">Food Stock</h1>
+                  <h1 class="font-semibold">{{ el.stok }}</h1>
+                </div>
+                <div
+                  class="flex gap-2 text-sm items-center group cursor-pointer"
+                  @click.prevent="deleteFood(idx)"
+                >
+                  <TrashIcon
+                    class="w-4 group-hover:stroke-red-500 flex items-center duration-300 ease-in-out"
+                  />
+                  <span>Delete</span>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <button
+            class="bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-6 py-3 w-auto"
+            @click.prevent="submitCatering"
           >
-            Klik untuk menuju form
-          </NuxtLink>
+            Submit makanan
+          </button>
         </div>
       </div>
 
@@ -1562,6 +1642,7 @@ definePageMeta({
   middleware: ["admin"],
 });
 import { initFlowbite } from "flowbite";
+import { useFoodStore } from "~/store/adminFood";
 
 onMounted(() => {
   initFlowbite();
@@ -1569,6 +1650,7 @@ onMounted(() => {
 const deleteState = ref(false);
 const config = useRuntimeConfig();
 const token = useCookie("token");
+const store = useFoodStore();
 
 const sideMenu = [
   "Fotografer",
@@ -1747,11 +1829,57 @@ async function deleteBand(id) {
   }).then((deleteState.value = !deleteState.value)),
     (modalBand.value = true);
 }
-console.log(bandList);
-
 // End Band
 
+// Catering
+
 let cateringList = data.value.data.attributes.caterings;
+
+let formCatering = ref({
+  location: "",
+  name: "",
+});
+
+let foodObjTemp = ref({
+  food: "",
+  price: 0,
+  stok: 0,
+});
+
+function addFoodList() {
+  store.pushFoodObj(foodObjTemp.value);
+  foodObjTemp.value = {
+    food: "",
+    price: 0,
+    stok: 0,
+  };
+}
+
+function deleteFood(idx) {
+  store.deleteFoodObj(idx);
+}
+
+function submitCatering() {
+  const { data: dataCatering, error: errorCatering } = useFetch(
+    `${config.public.strapiEndpoint}/caterings`,
+    {
+      method: "POST",
+      Authorization: "Bearer " + token.value,
+      body: {
+        data: {
+          location: formCatering.value.location,
+          name: formCatering.value.name,
+          food: store.foodList,
+          identifier: 1,
+        },
+      },
+    }
+  ).then(() => {
+    location.reload();
+    store.$reset();
+  });
+}
+// End Catering
 
 watch(data, () => {
   photographerList = data.value.data.attributes.photographers;
