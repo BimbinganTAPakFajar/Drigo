@@ -184,12 +184,12 @@ function remove(id) {
       <div class="flex flex-col gap-10">
         <div class="flex gap-20 items-center">
           <div class="flex flex-col gap-2">
-            <h1 class="font-semibold text-xl">Catering Name</h1>
+            <h1 class="font-semibold text-xl">Nama Katering</h1>
             <span>{{ cateringName }} </span>
           </div>
 
           <div class="flex flex-col gap-2">
-            <h1 class="font-semibold text-xl">Catering location</h1>
+            <h1 class="font-semibold text-xl">Lokasi Katering</h1>
             <span>{{ cateringLocation }}</span>
           </div>
         </div>
@@ -204,49 +204,32 @@ function remove(id) {
             class="stroke-red-500 w-4 group-hover:rotate-90 duration-1000 ease-in-out"
           />
         </div>
-        <span class="text-red-500">Remove</span>
+        <span class="text-red-500">Hapus</span>
       </div>
     </div>
 
     <div class="relative overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead
-          class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-        >
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3">Food name</th>
-            <th scope="col" class="px-6 py-3">Price / piece</th>
-            <th scope="col" class="px-6 py-3">Stock</th>
-            <th scope="col" class="px-6 py-3">Edit</th>
+            <th scope="col" class="px-6 py-3">Nama Makanan</th>
+            <th scope="col" class="px-6 py-3">Harga / Satuan</th>
+            <th scope="col" class="px-6 py-3">Stok</th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-            v-for="el in cateringFood"
-            :key="el.id"
-          >
+          <tr class="bg-white border-b" v-for="el in cateringFood" :key="el.id">
             <th
               scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
             >
               {{ el.food }}
             </th>
             <td class="px-6 py-4">{{ el.price }}</td>
             <td class="px-6 py-4">{{ el.stok }}</td>
-            <td class="px-6 py-4 flex gap-2 group cursor-pointer">
-              <PencilIcon
-                class="w-4 group-hover:stroke-blue-500 duration-300 ease-in-out"
-              />
-              <span class="group-hover:text-blue-500 ease-in-out duration-300"
-                >Edit</span
-              >
-            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </template>
-
-

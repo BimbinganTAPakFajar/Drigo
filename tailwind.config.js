@@ -14,13 +14,4 @@ module.exports = {
     require("flowbite/plugin"),
     require("@tailwindcss/typography"),
   ],
-  daisyui: {
-    styled: true,
-    themes: false,
-    base: true,
-    utils: true,
-    logs: false,
-    rtl: false,
-    prefix: "",
-  },
 };

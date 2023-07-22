@@ -23,17 +23,15 @@
           <p class="group-hover:-ml-2 duration-300 ease-in-out">Back</p>
         </div>
         <h1
-          class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+          class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
         >
           Selamat datang
           <span
-            class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"
+            class="underline underline-offset-3 decoration-8 decoration-blue-400"
             >Kami menunggumu</span
           >
         </h1>
-        <p
-          class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400"
-        >
+        <p class="text-lg font-normal text-gray-500 lg:text-xl">
           Log in dan mulailah petualangan menarik merancang pernikahan impianmu!
           Ubah setiap detail sesuai selera, buat momenmu menjadi lebih berkesan!
         </p>

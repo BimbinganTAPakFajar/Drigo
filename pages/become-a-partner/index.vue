@@ -8,6 +8,7 @@ definePageMeta({
   middleware: ["auth-partner", "user", "is-logged"],
 });
 //reactive var
+const config = useRuntimeConfig();
 
 let experience = ref();
 let price = ref();
@@ -56,6 +57,84 @@ const role = useCookie("role");
 const userID = useCookie("id");
 const auth = useCookie("isAuth");
 
+const { data: dataOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/photographers?filters[user][id][$eq]=${userID.value}&populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+
+const { data: dataVenueOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/venues?filters[user][id][$eq]=${userID.value}&populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+const { data: dataCateringOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/caterings?filters[user][id][$eq]=${userID.value}&populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+const { data: dataMUAOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/make-up-artists?filters[user][id][$eq]=${userID.value}&populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+
+const { data: dataBandsOrder } = await useFetch(
+  `${config.public.strapiEndpoint}/bands?filters[user][id][$eq]=${userID.value}&populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+
+const filteredPhotographer = computed(() => {
+  return dataOrder.value.data.filter(
+    (item) => item.attributes.orders.data.length > 0
+  );
+});
+
+const filteredVenue = computed(() => {
+  return dataVenueOrder.value.data.filter(
+    (item) => item.attributes.orders.data.length > 0
+  );
+});
+
+const filteredCatering = computed(() => {
+  return dataCateringOrder.value.data.filter(
+    (item) => item.attributes.orders.data.length > 0
+  );
+});
+
+const filteredMUA = computed(() => {
+  return dataMUAOrder.value.data.filter(
+    (item) => item.attributes.orders.data.length > 0
+  );
+});
+
+const filteredBand = computed(() => {
+  return dataBandsOrder.value.data.filter(
+    (item) => item.attributes.orders.data.length > 0
+  );
+});
+
 function logout() {
   token.value = undefined;
   role.value = undefined;
@@ -65,7 +144,6 @@ function logout() {
 }
 //config
 
-const config = useRuntimeConfig();
 // menu tab
 const menu = ["Photographer", "Venue", "Catering", " Make Up Artist", "Band"];
 const menuHistory = ["History", "Order"];
@@ -97,8 +175,35 @@ const { data: dataVenue, pending: pendingVenue } = useFetch(
 
 // Tabbing History or Order
 
+async function deletePhotographer(id) {
+  await useFetch(`${config.public.strapiEndpoint}/photographers/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }).then(location.reload());
+}
+
 async function deleteBand(id) {
   await useFetch(`${config.public.strapiEndpoint}/bands/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }).then(location.reload());
+}
+
+async function deleteVenue(id) {
+  await useFetch(`${config.public.strapiEndpoint}/venues/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }).then(location.reload());
+}
+
+async function deleteMUA(id) {
+  await useFetch(`${config.public.strapiEndpoint}/make-up-artists/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: "Bearer " + token.value,
@@ -403,22 +508,109 @@ function remove(id) {
           </div>
         </div>
 
+        <!-- Tab Idx 0  -->
         <div
           class="flex flex-col gap-6 mt-10"
           v-if="history === 0 && selected === 0"
         >
-          <CardPartner
-            v-for="(el, idx) in historyPartner.photographers"
-            :key="idx"
-            :price="el.price"
-            :experience="el.yearExperience"
-            :Skills="el.skills"
-            :id="el.id"
-            :token="token"
-            :type="1"
-            @refresh="refresh"
-          />
+          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left text-gray-500">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Id</th>
+                  <th scope="col" class="px-6 py-3">Nama</th>
+                  <th scope="col" class="px-6 py-3">Link Portofolio</th>
+                  <th scope="col" class="px-6 py-3">Harga</th>
+                  <th scope="col" class="px-6 py-3">Servis</th>
+                  <th scope="col" class="px-6 py-3">Pengalaman (Tahun)</th>
+                  <th scope="col" class="px-6 py-3">Deskripsi singkat</th>
+                  <th scope="col" class="px-6 py-3">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr
+                  class="bg-white border-b"
+                  v-for="el in historyPartner.photographers"
+                  :key="el.id"
+                >
+                  <th
+                    scope="row"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {{ el.id }}
+                  </th>
+                  <td
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {{ el.name }}
+                  </td>
+                  <td
+                    class="px-6 py-4 text-blue-600 dark:text-blue-500 hover:underline"
+                  >
+                    <NuxtLink :to="el.portofolioLink"
+                      >Klik melihat portofolio</NuxtLink
+                    >
+                  </td>
+                  <td class="px-6 py-4">{{ el.price }}</td>
+                  <td class="px-6 py-4">{{ el.serviceProvided }}</td>
+                  <td class="px-6 py-4">{{ el.yearExperience }}</td>
+                  <td class="px-6 py-4">{{ el.description }}</td>
+                  <td class="px-6 py-4">
+                    <div
+                      @click="deletePhotographer(el.id)"
+                      class="cursor-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    >
+                      Hapus
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+        <div
+          class="flex flex-col gap-10 py-10"
+          v-if="history === 1 && selected === 0"
+        >
+          <div
+            v-for="(el, idx) in filteredPhotographer"
+            id="alert-additional-content-1"
+            class="p-4 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-white"
+            role="alert"
+          >
+            <div class="flex items-center">
+              <svg
+                class="flex-shrink-0 w-4 h-4 mr-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                />
+              </svg>
+              <span class="sr-only">Info</span>
+              <h3 class="text-lg font-medium">
+                Pemesanan Jasa Fotografer Service ID {{ el.id }}
+              </h3>
+            </div>
+            <div class="mt-2 mb-4 text-sm">
+              Kamu mendapatkan pemesanan jasa fotografer pada tanggal berikut :
+              <ul
+                class="max-w-md space-y-1 text-blue-800 list-disc list-inside pt-3"
+              >
+                <li v-for="(element, idx) in el.attributes.orders.data">
+                  {{ element.attributes.Date }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- End Tab idx 0 -->
+
+        <!-- Tab idx 1 -->
         <div
           class="flex flex-col gap-6 mt-10"
           v-if="history === 0 && selected === 1"
@@ -477,13 +669,10 @@ function remove(id) {
           </div>
 
           <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table
-              class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
-            >
-              <thead
-                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-              >
+            <table class="w-full text-sm text-left text-gray-500">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
+                  <th scope="col" class="px-6 py-3">Id</th>
                   <th scope="col" class="px-6 py-3">Nama</th>
                   <th scope="col" class="px-6 py-3">Link Portofolio</th>
                   <th scope="col" class="px-6 py-3">Harga</th>
@@ -498,12 +687,12 @@ function remove(id) {
                 <button
                   disabled
                   type="button"
-                  class="py-2.5 px-5 mr-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 inline-flex items-center"
+                  class="py-2.5 px-5 mr-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-blue-700 focus:text-blue-700 inline-flex items-center"
                 >
                   <svg
                     aria-hidden="true"
                     role="status"
-                    class="inline w-4 h-4 mr-3 text-gray-200 animate-spin dark:text-gray-600"
+                    class="inline w-4 h-4 mr-3 text-gray-200 animate-spin"
                     viewBox="0 0 100 101"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -523,20 +712,25 @@ function remove(id) {
 
               <tbody v-else>
                 <tr
-                  class="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
+                  class="bg-white border-b"
                   v-for="(el, idx) in dataVenue.data"
                   :key="el.id"
                 >
                   <th
                     scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {{ el.id }}
+                  </th>
+                  <td
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                   >
                     {{ el.attributes.venueName }}
-                  </th>
+                  </td>
                   <td>
                     <NuxtLink
                       :to="el.attributes.venueLink"
-                      class="px-6 py-4 text-blue-600 dark:text-blue-500 hover:underline"
+                      class="px-6 py-4 text-blue-600 hover:underline"
                       >Link Venue</NuxtLink
                     >
                   </td>
@@ -566,6 +760,51 @@ function remove(id) {
             </table>
           </div>
         </div>
+
+        <div
+          class="flex flex-col gap-10 py-10"
+          v-if="history === 1 && selected === 1"
+        >
+          <div
+            v-for="(el, idx) in filteredVenue"
+            id="alert-additional-content-1"
+            class="p-4 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-white"
+            role="alert"
+          >
+            <div class="flex items-center">
+              <svg
+                class="flex-shrink-0 w-4 h-4 mr-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                />
+              </svg>
+              <span class="sr-only">Info</span>
+              <h3 class="text-lg font-medium">
+                Pemesanan Jasa Tempat Pernikahan Service ID {{ el.id }}
+              </h3>
+            </div>
+            <div class="mt-2 mb-4 text-sm">
+              Kamu mendapatkan pemesanan jasa tempat pernikahan pada tanggal
+              berikut :
+              <ul
+                class="max-w-md space-y-1 text-blue-800 list-disc list-inside pt-3"
+              >
+                <li v-for="(element, idx) in el.attributes.orders.data">
+                  {{ element.attributes.Date }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- End Tab idx 1 -->
+
+        <!-- Tab idx 2 -->
         <div
           class="flex flex-col gap-6 mt-10"
           v-if="history === 0 && selected === 2"
@@ -582,52 +821,149 @@ function remove(id) {
             @refresh="refresh"
           />
         </div>
+
+        <div
+          class="flex flex-col gap-10 py-10"
+          v-if="history === 1 && selected === 2"
+        >
+          <div
+            v-for="(el, idx) in filteredCatering"
+            id="alert-additional-content-1"
+            class="p-4 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-white"
+            role="alert"
+          >
+            <div class="flex items-center">
+              <svg
+                class="flex-shrink-0 w-4 h-4 mr-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                />
+              </svg>
+              <span class="sr-only">Info</span>
+              <h3 class="text-lg font-medium">
+                Pemesanan Jasa Penyedia Makanan Service ID {{ el.id }}
+              </h3>
+            </div>
+            <div class="mt-2 mb-4 text-sm">
+              Kamu mendapatkan pemesanan jasa penyedia makanan pada tanggal
+              berikut :
+              <ul
+                class="max-w-md space-y-1 text-blue-800 list-disc list-inside pt-3"
+              >
+                <li v-for="(element, idx) in el.attributes.orders.data">
+                  {{ element.attributes.Date }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- End Tab idx 2 -->
+
+        <!-- Tab idx 3 -->
         <div
           class="flex flex-col gap-6 mt-10"
           v-if="history === 0 && selected === 3"
         >
+          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left text-gray-500">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Id</th>
+                  <th scope="col" class="px-6 py-3">Nama</th>
+                  <th scope="col" class="px-6 py-3">Link Portofolio</th>
+                  <th scope="col" class="px-6 py-3">Harga</th>
+                  <th scope="col" class="px-6 py-3">Servis</th>
+                  <th scope="col" class="px-6 py-3">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr
+                  class="bg-white border-b"
+                  v-for="el in historyPartner.make_up_artists"
+                  :key="el.id"
+                >
+                  <th
+                    scope="row"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {{ el.id }}
+                  </th>
+                  <td
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {{ el.name }}
+                  </td>
+                  <td class="px-6 py-4 text-blue-600 hover:underline">
+                    <NuxtLink :to="el.portofolioLink"
+                      >Klik melihat portofolio</NuxtLink
+                    >
+                  </td>
+                  <td class="px-6 py-4">{{ el.price }}</td>
+                  <td class="px-6 py-4">{{ el.serviceProvided }}</td>
+                  <td class="px-6 py-4">
+                    <div
+                      @click="deleteMUA(el.id)"
+                      class="cursor-pointer font-medium text-blue-600 hover:underline"
+                    >
+                      Hapus
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col gap-10 py-10"
+          v-if="history === 1 && selected === 3"
+        >
           <div
-            v-for="el in historyPartner.make_up_artists"
-            :key="el.id"
-            class="flex p-6 items-center justify-between w-full shadow-lg shadow-black/15 rounded-xl"
+            v-for="(el, idx) in filteredMUA"
+            id="alert-additional-content-1"
+            class="p-4 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-white"
+            role="alert"
           >
-            <div class="flex flex-col gap-2">
-              <h1 class="font-semibold text-xl">Name</h1>
-              <span>{{ el.name }} </span>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <h1 class="font-semibold text-xl">Price</h1>
-              <span>{{ el.price }}</span>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <h1 class="font-semibold text-xl">Servis</h1>
-              <span>{{ el.serviceProvided }}</span>
-            </div>
-            <div class="w-[1px] bg-black/20 h-14 rounded-full"></div>
-
-            <div class="flex items-center gap-4">
-              <NuxtLink
-                target="_blank"
-                :to="el.portofolioLink"
-                class="text-xl font-semibold"
-                >Portofolio Link
-              </NuxtLink>
-            </div>
-            <div
-              class="flex items-center gap-2 cursor-pointer group"
-              @click="remove(el.id)"
-            >
-              <div class="border-[1px] border-red-500">
-                <XMarkIcon
-                  class="stroke-red-500 w-4 group-hover:rotate-90 duration-1000 ease-in-out"
+            <div class="flex items-center">
+              <svg
+                class="flex-shrink-0 w-4 h-4 mr-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
                 />
-              </div>
-              <span class="text-red-500">Remove</span>
+              </svg>
+              <span class="sr-only">Info</span>
+              <h3 class="text-lg font-medium">
+                Pemesanan Jasa Penyedia Rias Pengantin Service ID {{ el.id }}
+              </h3>
+            </div>
+            <div class="mt-2 mb-4 text-sm">
+              Kamu mendapatkan pemesanan jasa penyedia rias pengantin pada
+              tanggal berikut :
+              <ul
+                class="max-w-md space-y-1 text-blue-800 list-disc list-inside pt-3"
+              >
+                <li v-for="(element, idx) in el.attributes.orders.data">
+                  {{ element.attributes.Date }}
+                </li>
+              </ul>
             </div>
           </div>
         </div>
+
+        <!-- End Tab idx 3 -->
+
+        <!-- Tab idx 4 -->
         <div
           class="flex flex-col gap-6 mt-10"
           v-if="history === 0 && selected === 4"
@@ -636,10 +972,9 @@ function remove(id) {
             <table
               class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
             >
-              <thead
-                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-              >
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
+                  <th scope="col" class="px-6 py-3">Id</th>
                   <th scope="col" class="px-6 py-3">Nama</th>
                   <th scope="col" class="px-6 py-3">Harga</th>
                   <th scope="col" class="px-6 py-3">Genre</th>
@@ -650,21 +985,20 @@ function remove(id) {
 
               <tbody>
                 <tr
-                  class="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
+                  class="bg-white border-b"
                   v-for="el in historyPartner.bands"
                   :key="el.id"
                 >
                   <th
                     scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                   >
-                    {{ el.Name }}
+                    {{ el.id }}
                   </th>
+                  <td class="px-6 py-4">{{ el.Name }}</td>
                   <td class="px-6 py-4">{{ el.Price }}</td>
                   <td class="px-6 py-4">{{ el.Genre }}</td>
-                  <td
-                    class="px-6 py-4 text-blue-600 dark:text-blue-500 hover:underline"
-                  >
+                  <td class="px-6 py-4 text-blue-600 hover:underline">
                     <NuxtLink :to="el.portofolioLink"
                       >Klik melihat portofolio</NuxtLink
                     >
@@ -672,7 +1006,7 @@ function remove(id) {
                   <td class="px-6 py-4">
                     <div
                       @click="deleteBand(el.id)"
-                      class="cursor-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      class="cursor-pointer font-medium text-blue-600 hover:underline"
                     >
                       Hapus
                     </div>
@@ -682,6 +1016,48 @@ function remove(id) {
             </table>
           </div>
         </div>
+
+        <div
+          class="flex flex-col gap-10 py-10"
+          v-if="history === 1 && selected === 4"
+        >
+          <div
+            v-for="(el, idx) in filteredBand"
+            id="alert-additional-content-1"
+            class="p-4 mb-4 text-blue-800 border border-blue-300 rounded-lg bg-white"
+            role="alert"
+          >
+            <div class="flex items-center">
+              <svg
+                class="flex-shrink-0 w-4 h-4 mr-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                />
+              </svg>
+              <span class="sr-only">Info</span>
+              <h3 class="text-lg font-medium">
+                Pemesanan Jasa Penyedia Rias Pengantin Service ID {{ el.id }}
+              </h3>
+            </div>
+            <div class="mt-2 mb-4 text-sm">
+              Kamu mendapatkan pemesanan jasa penyedia rias pengantin pada
+              tanggal berikut :
+              <ul
+                class="max-w-md space-y-1 text-blue-800 list-disc list-inside pt-3"
+              >
+                <li v-for="(element, idx) in el.attributes.orders.data">
+                  {{ element.attributes.Date }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!--  End Tab Idx 4 -->
       </div>
     </div>
   </div>

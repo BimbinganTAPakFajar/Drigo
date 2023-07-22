@@ -208,11 +208,11 @@
 
     <div class="flex w-full items-center justify-center flex-col gap-10">
       <h1
-        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
       >
         Keberkahan dalam Setiap Jepretan:
         <span
-          class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"
+          class="underline underline-offset-3 decoration-8 decoration-blue-400"
           >Galeri Pesona</span
         >
       </h1>
@@ -274,9 +274,9 @@ console.log(dataCrew.value);
 const events = computed(() => {
   return dataCal.value.data.map((item) => {
     return {
-      start: item.attributes.startEvent, // assuming these keys exist in the `attributes` object
+      start: item.attributes.startEvent,
       end: item.attributes.endEvent,
-      title: item.attributes.user?.data?.attributes.username + " wedding",
+      title: item.attributes.user.data.attributes.username + " wedding",
     };
   });
 });

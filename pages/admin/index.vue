@@ -391,6 +391,65 @@
         </div>
       </div>
 
+      <div
+        class="fixed left-0 top-0 w-full h-screen z-40"
+        v-if="modalFoodCatering"
+      >
+        <div
+          class="flex w-full items-center justify-center h-screen bg-black/50 backdrop-blur-md"
+        >
+          <div class="relative overflow-x-auto">
+            <table
+              class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+            >
+              <thead
+                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+              >
+                <tr>
+                  <th scope="col" class="px-6 py-3">Nama Makanan</th>
+                  <th scope="col" class="px-6 py-3">Harga</th>
+                  <th scope="col" class="px-6 py-3">Stok</th>
+                  <th scope="col" class="px-6 py-3">
+                    <svg
+                      @click="modalFoodCatering = false"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(el, idx) in cateringList.data[cateringIndex]
+                    .attributes.food"
+                  :key="idx"
+                  class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <th
+                    scope="row"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    {{ el.food }}
+                  </th>
+                  <td class="px-6 py-4">{{ el.price }}</td>
+                  <td class="px-6 py-4">{{ el.stok }}</td>
+                  <td class="px-6 py-4"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table
           class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
@@ -400,12 +459,9 @@
           >
             <tr>
               <th scope="col" class="px-6 py-3">Nama</th>
-              <th scope="col" class="px-6 py-3">Link Portofolio</th>
-              <th scope="col" class="px-6 py-3">Harga</th>
-              <th scope="col" class="px-6 py-3">Servis</th>
-              <th scope="col" class="px-6 py-3">Pengalaman (Tahun)</th>
-              <th scope="col" class="px-6 py-3">Deskripsi singkat</th>
-              <th scope="col" class="px-6 py-3">Action</th>
+              <th scope="col" class="px-6 py-3">Alamat</th>
+              <th scope="col" class="px-6 py-3">Tabel Makanan</th>
+              <th scope="col" class="px-6 py-3">Aksi</th>
             </tr>
           </thead>
           <div v-if="pending">
@@ -437,29 +493,26 @@
           <tbody v-else>
             <tr
               class="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
-              v-for="el in cateringList.data"
+              v-for="(el, idx) in cateringList.data"
               :key="el.id"
             >
               <th
                 scope="row"
                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                {{ el.attributes.name }} {{ el.id }}
+                {{ el.attributes.name }}
               </th>
+
+              <td class="px-6 py-4">{{ el.attributes.location }}</td>
               <td
-                class="px-6 py-4 text-blue-600 dark:text-blue-500 hover:underline"
+                class="px-6 py-4 text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
               >
-                <NuxtLink :to="el.attributes.portofolioLink"
-                  >Klik melihat portofolio</NuxtLink
-                >
+                <div @click="openFoodModal(idx)">Klik melihat makanan</div>
               </td>
-              <td class="px-6 py-4">{{ el.attributes.price }}</td>
-              <td class="px-6 py-4">{{ el.attributes.serviceProvided }}</td>
-              <td class="px-6 py-4">{{ el.attributes.yearExperience }}</td>
-              <td class="px-6 py-4">{{ el.attributes.description }}</td>
+
               <td class="px-6 py-4">
                 <div
-                  @click="deletePhotographer(el.id)"
+                  @click="deleteCatering(el.id)"
                   class="cursor-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline"
                 >
                   Hapus
@@ -1324,7 +1377,7 @@
       </div>
     </div>
   </div>
-  <div class="p-4 sm:ml-64 md:py-14" v-if="tabIndex === 7">
+  <div class="p-4 sm:ml-64 md:py-14 flex flex-col gap-8" v-if="tabIndex === 7">
     <div
       class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700"
     >
@@ -1418,7 +1471,18 @@
                 v-for="el in photographerList.data"
               >
                 <input
+                  v-if="!editing"
                   @click="formPaket.fotografer = el.id"
+                  id="fotografer"
+                  type="radio"
+                  value=""
+                  name="fotografer"
+                  class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+                <input
+                  v-else
+                  @click="formPaket.fotografer = el.id"
+                  :checked="formPaket.fotografer == el.id"
                   id="fotografer"
                   type="radio"
                   value=""
@@ -1446,6 +1510,7 @@
             >
               <div class="flex items-center pl-3" v-for="el in dataDekor.data">
                 <input
+                  v-if="!editing"
                   @click="formPaket.dekor = el.id"
                   id="dekor"
                   type="radio"
@@ -1453,10 +1518,22 @@
                   name="dekor"
                   class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                 />
+
+                <input
+                  v-else
+                  @click="formPaket.dekor = el.id"
+                  :checked="formPaket.dekor == el.id"
+                  id="dekor"
+                  type="radio"
+                  value=""
+                  name="dekor"
+                  class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+
                 <label
                   for="dekor"
                   class="w-full py-3 ml-2 text-md font-medium text-gray-900 dark:text-gray-300"
-                  >{{ el.attributes.theme }} {{ formPaket.dekor }}
+                  >{{ el.attributes.theme }}
                 </label>
               </div>
             </li>
@@ -1474,6 +1551,7 @@
             >
               <div class="flex items-center pl-3" v-for="el in venueList.data">
                 <input
+                  v-if="!editing"
                   @click="formPaket.venue = el.id"
                   id="venue"
                   type="radio"
@@ -1481,6 +1559,17 @@
                   name="venue"
                   class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                 />
+                <input
+                  v-else
+                  @click="formPaket.venue = el.id"
+                  :checked="formPaket.venue == el.id"
+                  id="venue"
+                  type="radio"
+                  value=""
+                  name="venue"
+                  class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+
                 <label
                   for="venue"
                   class="w-full py-3 ml-2 text-md font-medium text-gray-900 dark:text-gray-300"
@@ -1511,12 +1600,23 @@
             >
               <div class="flex items-center pl-3">
                 <input
+                  v-if="!editing"
                   @click="addToArrayMUA(el.id)"
                   :id="`${el.id}mua`"
                   type="checkbox"
                   value=""
                   class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                 />
+                <input
+                  v-else
+                  @click="addToArrayMUA(el.id)"
+                  :checked="formPaket.mua.includes(el.id)"
+                  :id="`${el.id}mua`"
+                  type="checkbox"
+                  value=""
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+
                 <label
                   :id="`${el.id}mua`"
                   class="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -1547,7 +1647,17 @@
             >
               <div class="flex items-center pl-3">
                 <input
+                  v-if="!editing"
                   @click="addToArrayMC(el.id)"
+                  :id="`${el.id}mc`"
+                  type="checkbox"
+                  value=""
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+                <input
+                  v-else
+                  @click="addToArrayMC(el.id)"
+                  :checked="formPaket.mc.includes(el.id)"
                   :id="`${el.id}mc`"
                   type="checkbox"
                   value=""
@@ -1580,7 +1690,18 @@
                 v-for="el in cateringList.data"
               >
                 <input
+                  v-if="!editing"
                   @click="formPaket.catering = el.id"
+                  id="catering"
+                  type="radio"
+                  value=""
+                  name="catering"
+                  class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+                <input
+                  v-else
+                  @click="formPaket.catering = el.id"
+                  :checked="formPaket.catering == el.id"
                   id="catering"
                   type="radio"
                   value=""
@@ -1608,7 +1729,18 @@
             >
               <div class="flex items-center pl-3" v-for="el in bandList.data">
                 <input
+                  v-if="!editing"
                   @click="formPaket.band = el.id"
+                  id="band"
+                  type="radio"
+                  value=""
+                  name="band"
+                  class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+                <input
+                  v-else
+                  @click="formPaket.band = el.id"
+                  :checked="formPaket.band == el.id"
                   id="band"
                   type="radio"
                   value=""
@@ -1632,12 +1764,211 @@
           >
             Submit
           </button>
+          <button
+            v-if="editing"
+            @click.prevent="cancelEdit"
+            class="py-2.5 px-2 w-auto mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          >
+            Batalkan Edit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed z-50 right-[4%] bottom-[4%]" v-if="editing">
+      <button
+        class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+      >
+        <span
+          class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0"
+        >
+          Sedang Melakukan Edit...
+        </span>
+      </button>
+    </div>
+    <div class="flex flex-wrap gap-6">
+      <div
+        v-for="(el, idx) in dataPackage.data"
+        :key="idx"
+        class="w-full flex flex-col gap-6 max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h5
+            class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+          >
+            {{ el.attributes.packageName }}
+          </h5>
+          <div
+            @click="editPackage(el.id, idx)"
+            class="cursor-pointer text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
+          >
+            Edit Paket
+          </div>
+        </div>
+        <div class="flow-root space-y-4">
+          <h5
+            class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+          >
+            Deskripsi Paket
+          </h5>
+
+          <p>
+            {{ el.attributes.descriptionPackage }}
+          </p>
+        </div>
+
+        <div class="flow-root space-y-4">
+          <h5
+            class="text-xl font-medium leading-none text-gray-900 dark:text-white"
+          >
+            Harga dasar paket ini adalah
+            <span class="font-bold">Rp {{ el.attributes.basePrice }}</span>
+          </h5>
+        </div>
+
+        <div class="flow-root">
+          <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Master of Ceremonies
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div
+                  class="flex-1 min-w-0"
+                  v-for="(el, idx) in el.attributes.master_ceremonies.data"
+                >
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.Name }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Make up artist
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div
+                  class="flex-1 min-w-0"
+                  v-for="(el, idx) in el.attributes.make_up_artists.data"
+                >
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.name }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Katering
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.catering.data.attributes.name }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Fotografer
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.photographer.data.attributes.name }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Venue
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.venue.data.attributes.venueName }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Band
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ el.attributes.band.data.attributes.Name }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="py-3 sm:py-4 flex flex-col gap-6">
+              <h5
+                class="text-xl font-bold leading-none text-gray-900 dark:text-white"
+              >
+                Dekorasi
+              </h5>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{
+                      el.attributes.decoration_vendors.data[0].attributes.theme
+                    }}
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <button
+              @click.prevent="deletePackage(el.id)"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 w-full dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Delete
+            </button>
+          </ul>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import { TrashIcon } from "@heroicons/vue/24/outline";
 definePageMeta({
   middleware: ["admin"],
 });
@@ -1677,6 +2008,7 @@ const formPaket = ref({
   basePrice: 0,
 });
 
+let editing = ref(false);
 // State Modal
 
 const modalFoto = ref(false);
@@ -1834,7 +2166,8 @@ async function deleteBand(id) {
 // Catering
 
 let cateringList = data.value.data.attributes.caterings;
-
+let cateringIndex = ref(0);
+let modalFoodCatering = ref(false);
 let formCatering = ref({
   location: "",
   name: "",
@@ -1879,7 +2212,172 @@ function submitCatering() {
     store.$reset();
   });
 }
+
+function openFoodModal(idx) {
+  cateringIndex.value = idx;
+  modalFoodCatering.value = true;
+}
+
+async function deleteCatering(id) {
+  await useFetch(`${config.public.strapiEndpoint}/caterings/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }).then((deleteState.value = !deleteState.value)),
+    (modalCatering.value = true);
+}
 // End Catering
+
+// Package
+let idPackage = ref(0);
+function submit() {
+  if (!editing.value) {
+    useFetch(`${config.public.strapiEndpoint}/packages`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token.value,
+      },
+      body: {
+        data: {
+          // packageName: formPaket.value.packageName,
+          packageName: formPaket.value.packageName,
+          descriptionPackage: formPaket.value.descriptionPackage,
+          basePrice: Number(formPaket.value.basePrice),
+          decoration_vendors: {
+            id: Number(formPaket.value.dekor),
+          },
+          band: {
+            id: Number(formPaket.value.band),
+          },
+          make_up_artists: formPaket.value.mua,
+
+          master_ceremonies: formPaket.value.mc,
+
+          photographer: {
+            id: Number(formPaket.value.fotografer),
+          },
+          venue: {
+            id: Number(formPaket.value.venue),
+          },
+          catering: {
+            id: Number(formPaket.value.catering),
+          },
+        },
+      },
+    });
+  } else {
+    try {
+      useFetch(
+        `${config.public.strapiEndpoint}/packages/${Number(idPackage.value)}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: "Bearer " + token.value,
+          },
+          body: {
+            data: {
+              packageName: formPaket.value.packageName,
+              descriptionPackage: formPaket.value.descriptionPackage,
+              basePrice: Number(formPaket.value.basePrice),
+              decoration_vendors: {
+                id: Number(formPaket.value.dekor),
+              },
+              band: {
+                id: Number(formPaket.value.band),
+              },
+              make_up_artists: formPaket.value.mua,
+              master_ceremonies: formPaket.value.mc,
+
+              photographer: {
+                id: Number(formPaket.value.fotografer),
+              },
+              venue: {
+                id: Number(formPaket.value.venue),
+              },
+              catering: {
+                id: Number(formPaket.value.catering),
+              },
+            },
+          },
+        }
+      );
+
+      location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}
+const { data: dataPackage, pending: pendingPackage } = useFetch(
+  `${config.public.strapiEndpoint}/packages?populate=*`,
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token.value,
+    },
+  }
+);
+
+function editPackage(id, idx) {
+  editing.value = true;
+  idPackage.value = id;
+  formPaket.value.packageName =
+    dataPackage.value.data[idx].attributes.packageName;
+
+  formPaket.value.descriptionPackage =
+    dataPackage.value.data[idx].attributes.descriptionPackage;
+  formPaket.value.basePrice = dataPackage.value.data[idx].attributes.basePrice;
+  formPaket.value.dekor =
+    dataPackage.value.data[idx].attributes.decoration_vendors.data[0].id;
+  formPaket.value.band = dataPackage.value.data[idx].attributes.band.data.id;
+  dataPackage.value.data[idx].attributes.master_ceremonies.data.forEach(
+    (element) => {
+      formPaket.value.mc.push(element.id);
+    }
+  );
+  dataPackage.value.data[idx].attributes.make_up_artists.data.forEach(
+    (element) => {
+      formPaket.value.mua.push(element.id);
+    }
+  );
+  formPaket.value.fotografer =
+    dataPackage.value.data[idx].attributes.photographer.data.id;
+  formPaket.value.venue = dataPackage.value.data[idx].attributes.venue.data.id;
+  formPaket.value.catering =
+    dataPackage.value.data[idx].attributes.catering.data.id;
+}
+
+function cancelEdit() {
+  editing.value = false;
+  formPaket.value.packageName = "";
+  formPaket.value.descriptionPackage = "";
+  formPaket.value.basePrice = 0;
+  formPaket.value.dekor = "";
+  formPaket.value.band = "";
+  formPaket.value.mc = [];
+  formPaket.value.mua = [];
+  formPaket.value.fotografer = "";
+  formPaket.value.venue = "";
+  formPaket.value.catering = "";
+  console.log(formPaket.value);
+}
+
+function deletePackage(id) {
+  try {
+    useFetch(`${config.public.strapiEndpoint}/packages/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token.value,
+      },
+    });
+
+    location.reload();
+  } catch (err) {
+    console.log(err);
+  }
+}
+// End Package
 
 watch(data, () => {
   photographerList = data.value.data.attributes.photographers;
@@ -1888,41 +2386,4 @@ watch(data, () => {
   venueList = data.value.data.attributes.venues;
   cateringList = data.value.data.attributes.caterings;
 });
-
-// Package
-
-function submit() {
-  useFetch(`${config.public.strapiEndpoint}/packages`, {
-    method: "POST",
-    body: {
-      data: {
-        packageName: formPaket.value.packageName,
-        descriptionPackage: formPaket.value.descriptionPackage,
-        basePrice: formPaket.value.basePrice,
-        decoration_vendors: {
-          id: formPaket.value.dekor,
-        },
-        band: {
-          id: formPaket.value.band,
-        },
-        make_up_artists: {
-          id: formPaket.value.mua,
-        },
-        master_ceremonies: {
-          id: formPaket.value.mc,
-        },
-        photographer: {
-          id: formPaket.value.fotografer,
-        },
-        venue: {
-          id: formPaket.value.venue,
-        },
-        catering: {
-          id: formPaket.value.catering,
-        },
-      },
-    },
-  });
-}
-// End Package
 </script>
