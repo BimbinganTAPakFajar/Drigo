@@ -29,39 +29,37 @@
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span
-            >{{
-              Object.keys(package.attributes.photographer).length
-            }}
-            Photographer to capture your moment</span
-          >
+            >{{ Object.keys(package.attributes.photographer).length }}
+            Fotografer untuk mengabadikan momen Anda
+          </span>
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            Venue with capacity of
+            Tempat dengan kapasitas
             {{ package.attributes.venue.data?.attributes.capacity }}
-            people</span
+            orang</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ package.attributes.make_up_artists.data?.length }} Expert makeup
-            artistry for brides.</span
+            {{ package.attributes.make_up_artists.data?.length }} Keterampilan
+            makeup ahli untuk pengantin</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ package.attributes.master_ceremonies.data?.length }} MCs for
-            double the wedding magic</span
+            {{ package.attributes.master_ceremonies.data?.length }} Pembawa
+            acara untuk dua kali keajaiban pernikahan.</span
           >
         </li>
         <li class="flex gap-4">
           <CheckCircleIcon class="w-5 fill-[#3258E8]" />
           <span>
-            {{ Object.keys(package.attributes.catering)?.length }} Tantalizing
-            wedding catering.</span
+            {{ Object.keys(package.attributes.catering)?.length }} Katering
+            pernikahan yang menggiurkan.</span
           >
         </li>
 
@@ -82,10 +80,10 @@
         </li>
       </ul>
       <span
-        >Didn't match with the package? <br />
+        >Tidak cocok dengan paketnya? <br />
         <br />
-        you can customize the package that suits you <br />
-        the most with the base price of
+        Anda dapat menyesuaikan isi paket yang paling cocok untuk Anda <br />
+        dengan harga dasar mulai dari
         <strong class="text-xl">
           {{
             Intl.NumberFormat("id-ID", {

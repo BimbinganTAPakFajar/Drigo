@@ -5,7 +5,7 @@
     <div
       class="w-full flex gap-6 items-center justify-between group cursor-pointer"
     >
-      <NuxtLink to="/login" class="flex gap-6 group">
+      <NuxtLink to="/" class="flex gap-6 group">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

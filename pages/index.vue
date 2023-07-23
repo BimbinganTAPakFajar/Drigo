@@ -94,11 +94,11 @@
       <div class="flex gap-10"></div>
 
       <div class="flex flex-col gap-6 items-start">
-        <h4 class="text-base text-[#3258E8] font-semibold">Our Package</h4>
-        <h2 class="text-5xl font-bold text-black">Popular Wedding Packages</h2>
+        <h4 class="text-xl text-[#3258E8] font-semibold">Paket Kami</h4>
+        <h2 class="text-5xl font-bold text-black">Popular Paket Pernikahan</h2>
         <p class="text-base text-[#7B7B7B] w-2/3 tracking-wide">
-          If you're looking for the ultimate wedding experience, look no further
-          than our popular wedding package.
+          Jika Anda mencari pengalaman pernikahan yang luar biasa, tidak perlu
+          mencari lebih jauh dari paket pernikahan populer kami.
         </p>
         <div class="flex gap-10 items-start">
           <div
@@ -110,19 +110,19 @@
               v-if="idx === 0 && dataPackage"
               class="text-black font-semibold text-2xl"
             >
-              {{ dataPackage.data.length }} Variants
+              {{ dataPackage.data.length }} Jenis
             </h1>
             <h1
               v-else-if="idx === 0 && !dataPackage"
               class="text-black font-semibold text-2xl"
             >
-              None Variants
+              Tidak
             </h1>
             <h1
               v-else-if="idx === 1 && dataOrder"
               class="text-black font-semibold text-2xl"
             >
-              {{ dataOrder.data.length }} Valued
+              {{ dataOrder.data.length }} Istimewa
             </h1>
             <h1
               v-else-if="idx === 1 && dataOrder.length"
@@ -141,7 +141,7 @@
                 dataCrew?.data.attributes.make_up_artists.data.length +
                 dataCrew?.data.attributes.caterings.data.length
               }}
-              Person
+              Orang
             </h1>
             <h1
               v-else-if="idx === 2 && !dataCrew"

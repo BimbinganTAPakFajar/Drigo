@@ -46,12 +46,12 @@
           <input
             v-model="formData.email"
             type="text"
-            placeholder="Username"
+            placeholder="Email"
             class="text-sm w-96 pr-4 pl-2 focus:pl-6 py-2 rounded-md focus:ring-0 duration-300 ease-in-out focus:border-0"
             @change="v$.email.$touch"
           />
           <div class="text-red-500 text-sm pl-2" v-if="v$.email.$error">
-            <div>Please fill the username field</div>
+            <div>Please fill the Email field</div>
           </div>
         </div>
         <div class="flex flex-col gap-3">

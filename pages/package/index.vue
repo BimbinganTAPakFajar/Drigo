@@ -28,9 +28,9 @@ console.log(dataPackage.value);
         Package
       </h1>
       <p class="text-left font-medium text-slate-400 text-xl w-[60%] z-10">
-        Create Lasting Memories of Your Special Day with Our Wonderful Wedding
-        Package - The Perfect Way to Preserve Every Moment and Cherish Your Love
-        Story for Years to Come.
+        Ciptakan Kenangan Abadi Hari Spesial Anda dengan Paket Pernikahan Kami
+        yang Luar Biasa - Cara Sempurna untuk Melestarikan Setiap Momen dan
+        Menghargai Kisah Cinta Anda untuk Bertahun-tahun yang Akan Datang.
       </p>
       <img
         class="absolute z-0 w-1/2 -top-1/3 right-[5%] opacity-20"
@@ -75,17 +75,18 @@ console.log(dataPackage.value);
 
     <div class="flex flex-col gap-6 justify-start items-start w-full px-44">
       <h1 class="text-5xl text-slate-700 font-semibold">
-        Have any questions ?
+        Masih punya pertanyaan ?
       </h1>
       <span class="text-base text-slate-400 w-[55%]"
-        >If you have any questions about our team and how the customizable
-        package works. our team will be happy to help you.</span
+        >Jika Anda memiliki pertanyaan tentang tim kami dan bagaimana paket yang
+        dapat disesuaikan bekerja. Tim kami akan dengan senang hati membantu
+        Anda.</span
       >
 
       <a
-        href="mailto:drigoasihombing@gmail.com?subject=Question About Package"
+        href="mailto:drigoasihombing@gmail.com?subject=Pertanyaan tentang paket"
         class="bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-6 py-3 w-auto"
-        >Get in touch</a
+        >Hubungi kami</a
       >
     </div>
   </div>
