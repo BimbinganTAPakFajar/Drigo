@@ -66,7 +66,7 @@
       </div>
     </aside>
 
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 0">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 0">
       <div
         v-if="modalFoto === true"
         id="toast-danger"
@@ -231,7 +231,7 @@
         </div>
       </div>
     </div>
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 1">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 1">
       <div
         v-if="modalCatering === true"
         id="toast-danger"
@@ -527,7 +527,7 @@
         </div>
       </div>
     </div>
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 2">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 2">
       <div
         class="fixed z-40 left-0 top-0 w-full bg-black/50 backdrop-blur-md min-h-screen"
         v-if="modalGambar"
@@ -747,7 +747,7 @@
       </div>
     </div>
 
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 3">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 3">
       <div
         v-if="modalMUA === true"
         id="toast-danger"
@@ -909,7 +909,7 @@
       </div>
     </div>
 
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 4">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 4">
       <div
         v-if="modalMC === true"
         id="toast-danger"
@@ -1066,7 +1066,7 @@
       </div>
     </div>
 
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 5">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 5">
       <div
         v-if="modalDekor === true"
         id="toast-danger"
@@ -1218,7 +1218,7 @@
         </div>
       </div>
     </div>
-    <div class="p-4 sm:ml-64" v-if="tabIndex === 6">
+    <div class="p-4 sm:ml-64 min-h-screen" v-if="tabIndex === 6">
       <div
         v-if="modalBand === true"
         id="toast-danger"
@@ -1982,12 +1982,58 @@
         </div>
       </div>
     </div>
+
+    <div class="fixed z-50 left-0 top-0 w-full min-h-screen" v-if="logout">
+      <div
+        class="fixed bg-black/50 backdrop-blur-sm z-40 w-full min-h-screen text-white flex items-center justify-center"
+      >
+        <div class="relative w-full max-w-md max-h-full">
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="p-6 text-center">
+              <svg
+                class="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <h3
+                class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400"
+              >
+                Anda yakin ingin logout ?
+              </h3>
+              <button
+                @click="logoutAdmin"
+                type="button"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Ya, saya yakin.
+              </button>
+              <button
+                @click="logout = false"
+                type="button"
+                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+              >
+                Tidak, batalkan.
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
 import { TrashIcon } from "@heroicons/vue/24/outline";
 definePageMeta({
-  middleware: ["admin"],
+  middleware: ["admin", "admin-auth"],
 });
 import { initFlowbite } from "flowbite";
 import { useFoodStore } from "~/store/adminFood";
@@ -1998,6 +2044,8 @@ onMounted(() => {
 const deleteState = ref(false);
 const config = useRuntimeConfig();
 const token = useCookie("token");
+const isAuth = useCookie("isAuth");
+const role = useCookie("role");
 const store = useFoodStore();
 
 const sideMenu = [
@@ -2009,6 +2057,7 @@ const sideMenu = [
   "Dekorasi",
   "Band Pengiring",
   "Paket",
+  "Log out",
 ];
 
 const formPaket = ref({
@@ -2034,12 +2083,14 @@ const modalVenue = ref(false);
 const modalCatering = ref(false);
 const modalDekor = ref(false);
 const modalBand = ref(false);
-
+let logout = ref(false);
 // End State Modal
 
 const tabIndex = ref(0);
 function changeTab(idx) {
-  tabIndex.value = idx;
+  if (idx != 8) {
+    tabIndex.value = idx;
+  } else logout.value = true;
 }
 
 const { data, pending } = await useFetch(
@@ -2395,6 +2446,20 @@ function deletePackage(id) {
 }
 // End Package
 
+// Logout
+
+function logoutAdmin() {
+  try {
+    isAuth.value = undefined;
+    token.value = undefined;
+    role.value = undefined;
+    location.reload();
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// End Logout
 watch(data, () => {
   photographerList = data.value.data.attributes.photographers;
   muaList = data.value.data.attributes.make_up_artists;
