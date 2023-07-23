@@ -4,13 +4,17 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "@nuxtjs/fontaine",
-    
+
     // "@nuxtjs/html-validator",
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
     "@nuxt/content",
     "@vueuse/nuxt",
+    "@nuxtjs/color-mode",
   ],
+  colorMode: {
+    preference: "light", // default value of $colorMode.preference
+  },
   css: ["@/assets/css/style.css"],
   runtimeConfig: {
     public: {

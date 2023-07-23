@@ -3,7 +3,8 @@ import "vue3-carousel/dist/carousel.css";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import { ArrowSmallRightIcon, PlayIcon } from "@heroicons/vue/24/outline";
 import * as V from "v-calendar";
-
+const colorMode = useColorMode();
+console.log(colorMode.preference);
 import "v-calendar/style.css";
 definePageMeta({
   layout: "index",
@@ -503,7 +504,7 @@ function submitOrder() {
             id: arrayBand.value[0],
           },
           decoration_vendor: {
-            id: themePrice.value[0].id,co
+            id: themePrice.value[0].id,
           },
           totalPrice: totalPrice.value,
           startEvent: formattedStart.value,
@@ -642,12 +643,12 @@ function submitOrder() {
       :class="{
         'bg-rose-400': !modalOpen,
       }"
-      class="cursor-pointer right-[5%] bottom-[5%] px-4 py-2 fixed rounded-lg font-semibold z-30"
+      class="cursor-pointer right-[5%] bottom-[5%] px-4 py-2 fixed rounded-lg font-semibold z-30 text-black"
     >
       <Transition>
         <span v-if="!modalOpen">Total price</span>
 
-        <span v-else>Click anywhere to close</span>
+        <span v-else class="text-black">Click anywhere to close</span>
       </Transition>
     </div>
 
@@ -676,8 +677,8 @@ function submitOrder() {
             </span>
           </span>
         </div>
-        <h1 class="text-4xl font-semibold w-fit">Total Price</h1>
-        <span class="text-7xl font-bold w-fit"
+        <h1 class="text-4xl font-semibold w-fit text-black">Total Price</h1>
+        <span class="text-7xl font-bold w-fit text-black"
           >{{
             Intl.NumberFormat("id-ID", {
               style: "currency",
@@ -693,7 +694,7 @@ function submitOrder() {
         <div class="flex gap-6 flex-row items-center">
           <NuxtLink
             @click="submitOrder"
-            class="flex items-start border-[1px] border-gray-700 rounded-lg w-fit px-3 py-2 cursor-pointer hover:scale-105 ease-in-out duration-300"
+            class="text-black flex items-start border-[1px] border-gray-700 rounded-lg w-fit px-3 py-2 cursor-pointer hover:scale-105 ease-in-out duration-300"
             >Pay now!</NuxtLink
           >
         </div>
@@ -794,32 +795,7 @@ function submitOrder() {
             class="flex flex-col lg:flex-row items-start gap-32 lg:gap-6 w-full justify-between"
           >
             <!-- Category -->
-            <div
-              class="flex flex-col gap-4 justify-start w-full lg:w-1/4 group"
-            >
-              <div class="flex justify-between items-center">
-                <h1 class="font-semibold text-xl flex items-center gap-44">
-                  Category
-                </h1>
-                <div class="flex gap-10">
-                  <span class="text-sm text-slate-400">Not customizeable</span>
-                  <ArrowSmallRightIcon
-                    class="w-4 stroke-black group-hover:rotate-90 duration-300 ease-in-out"
-                  />
-                </div>
-              </div>
-              <div class="h-[1px] w-full bg-slate-700"></div>
-              <div
-                class="text-2xl flex gap-6 font-semibold justify-between items-center"
-              >
-                <PlayIcon class="w-6 stroke-gradient-pink/50" />
-                {{
-                  packageDetail.data[0].attributes.category.data.attributes
-                    .weddingCategory
-                }}
-                Wedding
-              </div>
-            </div>
+
             <!-- Base Price -->
             <div
               class="flex flex-col gap-4 justify-start w-full lg:w-1/2 group"
@@ -843,7 +819,7 @@ function submitOrder() {
                     Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
-                    }).format(10000000)
+                    }).format(basePrice)
                   }}
                 </span>
               </div>
@@ -1054,8 +1030,7 @@ function submitOrder() {
                 <PlayIcon class="w-6 stroke-gradient-pink/50" />
 
                 <div class="stats">
-                  <div class="stat">
-                    <div class="stat-figure text-primary"></div>
+                  <div class="stat bg-slate-100">
                     <div class="stat-title text-base">
                       Master of Ceremony Name
                     </div>
@@ -1066,7 +1041,7 @@ function submitOrder() {
                     </div>
                   </div>
 
-                  <div class="stat">
+                  <div class="stat bg-slate-100">
                     <div class="stat-figure text-secondary"></div>
                     <div class="stat-title text-base">Price</div>
                     <div
@@ -1081,7 +1056,7 @@ function submitOrder() {
                     </div>
                   </div>
 
-                  <div class="stat">
+                  <div class="stat bg-slate-100">
                     <div class="stat-value text-xl">Job Desc</div>
                     <div class="stat-title text-base">
                       {{ el.attributes.serviceProvided }}
@@ -1217,18 +1192,18 @@ function submitOrder() {
                     <div
                       class="stats stats-vertical lg:stats-horizontal shadow"
                     >
-                      <div class="stat">
-                        <div class="stat-value">
+                      <div class="stat bg-slate-100 text-black">
+                        <div class="stat-value text-black">
                           {{ availableBand[bandIndex].attributes.Name }}
                         </div>
-                        <div class="stat-title">Genre Music</div>
-                        <div class="stat-title">
+                        <div class="stat-title text-black">Genre Music</div>
+                        <div class="stat-title text-black">
                           {{ availableBand[bandIndex].attributes.Genre }}
                         </div>
                       </div>
 
-                      <div class="stat">
-                        <div class="stat-title">
+                      <div class="stat bg-slate-100 text-black">
+                        <div class="stat-title text-black">
                           Harga untuk menggunakan jasa band ini :
                         </div>
                         <div class="stat-value">
@@ -1240,7 +1215,7 @@ function submitOrder() {
                           }}
                         </div>
 
-                        <div class="stat-title">
+                        <div class="stat-title text-black">
                           sudah memberikan jasa sebanyak :
                           {{
                             availableBand[bandIndex].attributes.orders.data
@@ -1249,8 +1224,8 @@ function submitOrder() {
                         </div>
                       </div>
 
-                      <div class="stat">
-                        <div class="stat-title">
+                      <div class="stat bg-slate-100 text-black">
+                        <div class="stat-title text-black">
                           Klik tombol dibawah untuk melihat portofolio
                         </div>
                         <NuxtLink
@@ -1306,14 +1281,14 @@ function submitOrder() {
                     >
                       <div class="flex items-center pl-3">
                         <input
-                          id="default-radio-1"
+                          id="photographer"
                           type="radio"
                           @click="arrayPhotographer[0] = el.id"
                           :checked="arrayPhotographer.includes(el.id)"
                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                         />
                         <label
-                          for="default-radio-1"
+                          for="photographer"
                           class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                           >{{ el.attributes.name }}
                           <span
@@ -1484,14 +1459,14 @@ function submitOrder() {
                     >
                       <div class="flex items-center pl-3">
                         <input
-                          id="default-radio-1"
+                          id="catering"
                           type="radio"
                           @click="arrayCatering[0] = el.id"
                           :checked="arrayCatering.includes(el.id)"
                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                         />
                         <label
-                          for="default-radio-1"
+                          for="catering"
                           class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                           >{{ el.attributes.name }}
                           <span
@@ -1561,7 +1536,7 @@ function submitOrder() {
                                 availableCaterings[cateringIndex].id ===
                                 element.id
                               "
-                              class="text-[12px] text-gray-400 font-bol"
+                              class="text-[12px] text-gray-400 font-bold bg-white"
                               >Default Catering</span
                             >
                           </div>
@@ -1640,14 +1615,14 @@ function submitOrder() {
                       >
                         <div class="flex items-center pl-3">
                           <input
-                            id="default-radio-1"
+                            id="venue"
                             type="radio"
                             @click="arrayVenue[0] = el.id"
                             :checked="arrayVenue.includes(el.id)"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                           />
                           <label
-                            for="default-radio-1"
+                            for="venue"
                             class="flex flex-col gap-1 w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                             >{{ el.attributes.venueName }}
                             <span

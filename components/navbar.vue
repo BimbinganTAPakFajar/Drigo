@@ -101,15 +101,15 @@ const listBar = [
     url: "/",
   },
   {
-    name: "Package",
+    name: "Paket",
     url: "/package",
   },
   {
-    name: "About Us",
+    name: "Tentang Kami",
     url: "/about",
   },
   {
-    name: "Become a partner",
+    name: "Jadi Partner",
     url: "/become-a-partner",
   },
 ];

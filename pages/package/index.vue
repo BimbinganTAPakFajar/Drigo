@@ -17,8 +17,10 @@ console.log(dataPackage.value);
 </script>
 
 <template>
-  <div class="flex flex-col gap-44 items-center justify-center px-44 py-44">
-    <div class="flex flex-col gap-8 justify-center items-start w-full relative">
+  <div class="flex flex-col gap-44 items-center justify-center py-44 w-full">
+    <div
+      class="flex flex-col gap-8 justify-center items-start w-full relative px-44"
+    >
       <h1
         class="z-10 text-9xl py-4 font-semibold tracking-tighter text-transparent bg-clip-text bg-gradient-to-tr from-[#4568DC]/50 to-[#B06AB3]/50"
       >
@@ -39,14 +41,17 @@ console.log(dataPackage.value);
 
     <div
       v-if="pending"
-      class="absolute right-1/2 bottom-1/2 transform translate-x-1/2 translate-y-1/2"
+      class="absolute right-1/2 bottom-1/2 transform translate-x-1/2 translate-y-1/2 px-44"
     >
       <div
         class="border-t-transparent border-solid animate-spin rounded-full border-blue-400 border-8 h-64 w-64"
       ></div>
     </div>
 
-    <div v-else class="flex gap-10 items-start justify-center w-full">
+    <div
+      v-else
+      class="flex flex-row gap-10 items-start justify-center w-full flex-wrap"
+    >
       <CardPackage
         v-if="dataPackage.data.length > 0"
         v-for="el in dataPackage.data"
@@ -64,9 +69,11 @@ console.log(dataPackage.value);
       </div>
     </div>
 
-    <FAQ />
+    <div class="px-44">
+      <FAQ />
+    </div>
 
-    <div class="flex flex-col gap-6 justify-start items-start w-full">
+    <div class="flex flex-col gap-6 justify-start items-start w-full px-44">
       <h1 class="text-5xl text-slate-700 font-semibold">
         Have any questions ?
       </h1>

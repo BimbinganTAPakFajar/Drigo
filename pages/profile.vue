@@ -11,7 +11,7 @@ const { data: userData } = await useFetch(
   {
     method: "GET",
     headers: {
-      Authorization: "Bearer " + token,
+      Authorization: "Bearer " + token.value,
     },
   }
 );

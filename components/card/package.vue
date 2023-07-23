@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="shadow-lg py-8 px-20 rounded-lg flex flex-col gap-6">
+    <div class="shadow-lg py-8 px-10 rounded-lg flex flex-col gap-6 max-w-fit">
       <div class="flex flex-col gap-4">
         <h1 class="text-3xl font-semibold text-slate-600">
           {{ package.attributes.packageName }}
@@ -84,8 +84,8 @@
       <span
         >Didn't match with the package? <br />
         <br />
-        you can customize the package that suits you the most with the base
-        price of
+        you can customize the package that suits you <br />
+        the most with the base price of
         <strong class="text-xl">
           {{
             Intl.NumberFormat("id-ID", {
