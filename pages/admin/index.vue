@@ -143,6 +143,7 @@
             </p>
 
             <NuxtLink
+              target="_blank"
               to="https://docs.google.com/forms/d/e/1FAIpQLSfc68H0Tt_Q9uTyQzPIQnMM7mnIb9-mAQMfu3Y-bjtFQECdwA/viewform?usp=sf_link"
               class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
@@ -824,6 +825,7 @@
             </p>
 
             <NuxtLink
+              target="_blank"
               to="https://docs.google.com/forms/d/e/1FAIpQLSedmrIRxW7iqi4uwrVnII-BCvln1tPOERMlB_LRbHV8j54QQQ/viewform?usp=sf_link"
               class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
@@ -1143,6 +1145,7 @@
             </p>
 
             <NuxtLink
+              target="_blank"
               to="https://docs.google.com/forms/d/e/1FAIpQLSd9X4F7FG7QJnOLYwXGGP6ha4-i0Xd-qPdz3q-T9wovmFL6kQ/viewform?usp=sf_link"
               class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
@@ -1295,6 +1298,7 @@
             </p>
 
             <NuxtLink
+              target="_blank"
               to="https://docs.google.com/forms/d/e/1FAIpQLSeBEE7eUbusEbzb_m7PBiLvytk9KmREe2-IUPyuXTX4lxg1_g/viewform?usp=sf_link"
               class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >

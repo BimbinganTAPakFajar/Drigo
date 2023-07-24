@@ -117,7 +117,7 @@ const listBar = [
 const filteredBar = computed(() => {
   if (role.value == 3) {
     return listBar.filter(
-      (el) => !(el.name === "Become a partner" && role.value == 3)
+      (el) => !(el.name === "Jadi Partner" && role.value == 3)
     );
   } else return listBar;
 });
