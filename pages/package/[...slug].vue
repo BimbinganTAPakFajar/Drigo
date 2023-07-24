@@ -134,11 +134,11 @@ function getMUAIndex(idx) {
 
 // Fetch Data
 await $fetch(
-  `${config.public.strapiEndpoint}/packages?filters[slug]=${route.params.slug}&populate=*`,
+  `${config.public.strapiEndpoint}/packages?filters[packageName]=${route.params.slug}&populate=*`,
   {
     method: "GET",
     headers: {
-      Authorization: "Bearer " + token,
+      Authorization: "Bearer " + token.value,
     },
   }
 ).then((res) => {
@@ -713,18 +713,17 @@ function submitOrder() {
       </div>
 
       <div class="z-0 absolute right-1/4 opacity-50 top-0">
-        <img
+        <!-- <img
           v-if="
             packageDetail.data[0]?.attributes.category?.data.attributes
               .weddingCategory === 'Outdoor'
           "
-          src="@/public/assets/test.png"
+          src=""
           alt="Gate in Hakone, Japan"
           class="animate-pulse scale-125"
-        />
+        /> -->
         <img
-          v-else
-          src="@/public/assets/test2.png"
+          src="@/public/assets/test.png"
           alt="Gate in Hakone, Japan"
           class="animate-pulse w-2/3 translate-x-1/2 -translate-y-1/4"
         />

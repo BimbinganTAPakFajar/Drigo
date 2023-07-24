@@ -94,7 +94,7 @@
         </strong></span
       >
 
-      <NuxtLink :to="`/package/${package.attributes.Slug}`">
+      <NuxtLink :to="`/package/${package.attributes.packageName}`">
         <button
           class="w-full bg-[#3258E8] text-white rounded-xl focus:bg-[#2847BE] px-28 py-3"
         >
