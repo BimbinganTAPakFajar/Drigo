@@ -2300,39 +2300,44 @@ async function deleteCatering(id) {
 let idPackage = ref(0);
 function submit() {
   if (!editing.value) {
-    useFetch(`${config.public.strapiEndpoint}/packages`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token.value,
-      },
-      body: {
-        data: {
-          // packageName: formPaket.value.packageName,
-          packageName: formPaket.value.packageName,
-          descriptionPackage: formPaket.value.descriptionPackage,
-          basePrice: Number(formPaket.value.basePrice),
-          decoration_vendors: {
-            id: Number(formPaket.value.dekor),
-          },
-          band: {
-            id: Number(formPaket.value.band),
-          },
-          make_up_artists: formPaket.value.mua,
+    try {
+      useFetch(`${config.public.strapiEndpoint}/packages`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token.value,
+        },
+        body: {
+          data: {
+            // packageName: formPaket.value.packageName,
+            packageName: formPaket.value.packageName,
+            descriptionPackage: formPaket.value.descriptionPackage,
+            basePrice: Number(formPaket.value.basePrice),
+            decoration_vendors: {
+              id: Number(formPaket.value.dekor),
+            },
+            band: {
+              id: Number(formPaket.value.band),
+            },
+            make_up_artists: formPaket.value.mua,
 
-          master_ceremonies: formPaket.value.mc,
+            master_ceremonies: formPaket.value.mc,
 
-          photographer: {
-            id: Number(formPaket.value.fotografer),
-          },
-          venue: {
-            id: Number(formPaket.value.venue),
-          },
-          catering: {
-            id: Number(formPaket.value.catering),
+            photographer: {
+              id: Number(formPaket.value.fotografer),
+            },
+            venue: {
+              id: Number(formPaket.value.venue),
+            },
+            catering: {
+              id: Number(formPaket.value.catering),
+            },
           },
         },
-      },
-    });
+      });
+      location.reload();
+    } catch (err) {
+      console.log(err);
+    }
   } else {
     try {
       useFetch(
